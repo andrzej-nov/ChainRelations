@@ -1,5 +1,5 @@
 ## Gradle
-.gradle
+.gradle/
 gradle-app.setting
 build/
 
@@ -74,3 +74,5 @@ nb-configuration.xml
 *~
 *.*#
 *#*#
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
