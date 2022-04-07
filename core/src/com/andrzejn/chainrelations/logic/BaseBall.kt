@@ -19,7 +19,7 @@ class BaseBall {
         sideDist = r * distMult
         borderDist = 4f * sideDist * sideDist
         barrierForce = 15f * r
-        baseRepulsion = 9f * r * borderDist
+        baseRepulsion = 11f * r * borderDist
         forceLimit = 0.8f * r
         attraction = 6f * r
     }

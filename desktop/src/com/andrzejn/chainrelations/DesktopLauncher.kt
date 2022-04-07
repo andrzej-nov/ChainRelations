@@ -11,7 +11,7 @@ object DesktopLauncher {
         Lwjgl3Application(Main(), Lwjgl3ApplicationConfiguration().apply {
             setTitle("Chain Relations")
             setWindowedMode(960, 960)
-            //config.setForegroundFPS(60);
+            setForegroundFPS(60);
             //setWindowIcon("icon256.png", "icon128.png", "icon64.png", "icon32.png", "icon16.png")
         })
     }

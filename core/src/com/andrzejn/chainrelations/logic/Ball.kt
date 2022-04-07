@@ -23,7 +23,6 @@ class Ball(val ballsCount: Int, val bb: BaseBall) {
         val r = bb.radius * 0.8f
         var triL = bb.radius * 0.1f
         outCom.forEach {
-            val v = Vector2(r, 0f)
             it.coord.set(r, 0f)
             it.tri[0].set(it.coord).add(triL, 0f)
             it.tri[1].set(it.coord).add(-triL, -triL)
@@ -32,7 +31,6 @@ class Ball(val ballsCount: Int, val bb: BaseBall) {
             a += PI.toFloat() / 3f
         }
         inCom.forEach {
-            val v = Vector2(r, 0f)
             it.coord.set(r, 0f)
             it.tri[0].set(it.coord).add(-triL, 0f)
             it.tri[1].set(it.coord).add(triL, -triL)
@@ -44,21 +42,17 @@ class Ball(val ballsCount: Int, val bb: BaseBall) {
 
     fun draw(sd: ShapeDrawer, k: Float, c: Array<Color>) {
         val lw = bb.lineWidth * k
+        val rad = k * bb.radius * 0.15f
         outCom.plus(inCom).forEach {
             sd.setColor(c[it.color])
             if (it.conn != null)
-                sd.filledTriangle(
-                    Vector2(it.tri[0]).scl(k).add(this.coord),
-                    Vector2(it.tri[1]).scl(k).add(this.coord),
-                    Vector2(it.tri[2]).scl(k).add(this.coord)
-                )
-            else
-                sd.triangle(
-                    Vector2(it.tri[0]).scl(k).add(this.coord),
-                    Vector2(it.tri[1]).scl(k).add(this.coord),
-                    Vector2(it.tri[2]).scl(k).add(this.coord),
-                    lw
-                )
+                sd.filledCircle(Vector2(it.coord).scl(k).add(this.coord), rad)
+            else sd.triangle(
+                Vector2(it.tri[0]).scl(k).add(this.coord),
+                Vector2(it.tri[1]).scl(k).add(this.coord),
+                Vector2(it.tri[2]).scl(k).add(this.coord),
+                lw
+            )
         }
     }
 
@@ -70,7 +64,7 @@ class Ball(val ballsCount: Int, val bb: BaseBall) {
 
     fun calcRepulsions(balls: List<Ball>) {
         balls.forEach {
-            val f = Vector2(coord).sub(it.coord).nor().scl(bb.repulsion(coord.dst2(it.coord)))
+            val f = Vector2(coord).sub(it.coord).setLength(bb.repulsion(coord.dst2(it.coord)))
             addForce(f)
             it.addForce(f.scl(-1f))
         }

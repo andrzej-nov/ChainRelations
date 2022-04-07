@@ -1,6 +1,9 @@
 package com.andrzejn.chainrelations.logic
 
 import com.badlogic.gdx.math.Vector2
+import ktx.math.minus
+import ktx.math.plus
+import kotlin.math.sqrt
 
 class Connector {
     val inSocket: Socket
@@ -19,8 +22,9 @@ class Connector {
     val color: Int
 
     fun calcAttraction() {
-        val f = Vector2(outSocket.coord).add(outSocket.ball.coord).sub(inSocket.coord).sub(inSocket.ball.coord).nor().scl(attraction)
+        val f = Vector2(outSocket.coord).add(outSocket.ball.coord).sub(inSocket.coord).sub(inSocket.ball.coord).setLength(attraction)
         inSocket.addForce(f)
         outSocket.addForce(f.scl(-1f))
     }
+
 }

@@ -43,10 +43,19 @@ class World(val ballsCount: Int, radius: Float, var width: Float, var height: Fl
         b.coord.y = b.coord.y.coerceIn(br, height - br)
     }
 
-    fun hitTest(v: Vector2): Ball? = balls.firstOrNull { it.coord.dst(v) < bb.radius }
+    fun pointedBall(v: Vector2): Ball? {
+        return balls.firstOrNull { it.coord.dst(v) < bb.radius }
+    }
 
-    fun addConnector(pointedBall: Ball, otherBall: Ball) =
-        connectors.add(Connector(pointedBall.inCom[0], otherBall.outCom[0], bb.attraction))
+    fun addConnector(from: Socket, otherBall: Ball) =
+        connectors.add(
+            Connector(
+                from,
+                (if (from.ball.inCom.contains(from)) otherBall.outCom else otherBall.inCom)
+                    .first { it.conn == null && it.color == from.color },
+                bb.attraction
+            )
+        )
 
     fun randomHit() {
         balls.forEach {
