@@ -27,4 +27,9 @@ class Connector {
         outSocket.addForce(f.scl(-1f))
     }
 
+    fun clear() {
+        inSocket.conn = null
+        outSocket.conn = null
+    }
+
 }

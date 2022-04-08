@@ -1,6 +1,6 @@
 package com.andrzejn.chainrelations.logic
 
-class BaseBall {
+class WorldConstants {
     val distMult = 1.2f
     var radius: Float = 0f
     var lineWidth = 0f

@@ -150,12 +150,12 @@ class Context(
     val light: Array<Color> = arrayOf(
         Color.WHITE,
         Color(0xd1b153ff.toInt()),
-        Color(0x6d9eebff),
+        Color(0x6d9edbff),
         Color(0x8ab775ff.toInt()),
         Color(0xb250ffff.toInt()),
         Color(0xd68a00ff.toInt()),
         Color(0xcc4125ff.toInt()),
-        Color(0x40afafff),
+        Color(0x20bfbfff),
     )
 
     /**
@@ -164,7 +164,7 @@ class Context(
     val dark: Array<Color> = arrayOf(
         Color.LIGHT_GRAY,
         Color(0xbf9000ff.toInt()),
-        Color(0x1255ccff),
+        Color(0x2265bcff),
         Color(0x38761dff),
         Color(0x56007fff),
         Color(0xa85706ff.toInt()),
