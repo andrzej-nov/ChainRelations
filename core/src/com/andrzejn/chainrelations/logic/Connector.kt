@@ -1,16 +1,13 @@
 package com.andrzejn.chainrelations.logic
 
 import com.badlogic.gdx.math.Vector2
-import ktx.math.minus
-import ktx.math.plus
-import kotlin.math.sqrt
 
 class Connector {
-    val inSocket: Socket
-    val outSocket: Socket
+    val inSocket: InSocket
+    val outSocket: OutSocket
     var attraction: Float
 
-    constructor(inSocket: Socket, outSocket: Socket, attraction: Float) {
+    constructor(inSocket: InSocket, outSocket: OutSocket, attraction: Float) {
         this.inSocket = inSocket
         this.outSocket = outSocket
         this.attraction = attraction
@@ -21,8 +18,10 @@ class Connector {
 
     val color: Int
 
+    private val f = Vector2()
+
     fun calcAttraction() {
-        val f = Vector2(outSocket.coord).add(outSocket.ball.coord).sub(inSocket.coord).sub(inSocket.ball.coord).setLength(attraction)
+        f.set(outSocket.absCoord()).sub(inSocket.absCoord()).setLength(attraction)
         inSocket.addForce(f)
         outSocket.addForce(f.scl(-1f))
     }

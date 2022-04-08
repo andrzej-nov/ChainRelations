@@ -1,6 +1,7 @@
 package com.andrzejn.chainrelations
 
 import aurelienribon.tweenengine.TweenManager
+import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureAtlasLoader
@@ -45,6 +46,8 @@ class Context(
      * The main object that handles all animations
      */
     val tweenManager: TweenManager = TweenManager()
+
+    lateinit var wc: WorldConstants
 
     init { // Need to specify which objects' properties will be used for animations
         //Tween.registerAccessor(Sprite::class.java, SpriteAccessor())
