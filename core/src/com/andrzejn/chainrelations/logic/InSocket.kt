@@ -1,7 +1,6 @@
 package com.andrzejn.chainrelations.logic
 
 import com.andrzejn.chainrelations.Context
-import com.badlogic.gdx.math.Polygon
 import com.badlogic.gdx.math.Vector2
 import space.earlygrey.shapedrawer.JoinType
 
@@ -19,8 +18,8 @@ class InSocket(ctx: Context, ball: Ball) : BaseSocket(ctx, ball) {
 
     private val f = FloatArray(8)
 
-    override fun draw(k: Float, center: Vector2) {
-        super.draw(k, center)
+    override fun draw(k: Float, center: Vector2, alpha: Float) {
+        super.draw(k, center, alpha)
         if (conn != null)
             return
         f[0] = mark[0].x * k + center.x

@@ -16,8 +16,8 @@ class OutSocket(ctx: Context, ball: Ball) : BaseSocket(ctx, ball) {
 
     private val v = Array(3) { Vector2() }
 
-    override fun draw(k: Float, center: Vector2) {
-        super.draw(k, center)
+    override fun draw(k: Float, center: Vector2, alpha: Float) {
+        super.draw(k, center, alpha)
         if (conn != null)
             return
         ctx.sd.triangle(

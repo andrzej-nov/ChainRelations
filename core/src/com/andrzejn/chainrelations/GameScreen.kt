@@ -53,24 +53,24 @@ class GameScreen(val ctx: Context) : KtxScreen {
         world.moveBalls(delta)
         world.blinkRandomBall { b -> ballBlinked(b) }
         ctx.tweenManager.update(delta)
+        world.balls.filter { it.inBlink }.forEach { it.setEyeCoords() }
         ctx.batch.begin()
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limit circle.
             ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
         world.drawConnectors()
-        world.balls.filter { it.inBlink }.forEach { it.setEyeCoords() }
         world.balls.filter { dF != null || it != pB }.forEach {
             setBallSpriteBounds(it.drawCoord, 1f)
             ball.color =
                 if (dF != null && suitableTargets?.contains(it) == true) ctx.dark[dF.color] else Color.GRAY
-            ball.draw(ctx.batch)
+            ball.draw(ctx.batch, it.alpha)
             it.drawElements()
         }
         ball.color = Color.GRAY
         if (pB != null && dF == null) { // Draw large pointed ball to pick a connector and start drag
             setBallSpriteBounds(pointedBallCenter, 2f)
-            ball.draw(ctx.batch)
+            ball.draw(ctx.batch, pB.alpha)
             pB.drawElements(2f, pointedBallCenter)
         }
         if (dF != null && dragTo.x > 0)

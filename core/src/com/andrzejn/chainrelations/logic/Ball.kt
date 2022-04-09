@@ -98,7 +98,7 @@ class Ball(val ctx: Context) {
     }
 
     fun drawElements(k: Float = 1f, center: Vector2 = drawCoord) {
-        sockets.forEach { it.draw(k, center) }
+        sockets.forEach { it.draw(k, center, alpha) }
         drawEyes(k, center)
     }
 
@@ -106,6 +106,8 @@ class Ball(val ctx: Context) {
     var eyeR = Vector2() to Vector2()
     var eyeHk: Float = 1f
     var inBlink = false
+    var inDeath = false
+    var alpha: Float = 1f
 
     fun setEyeCoords() {
         val len = ctx.wc.radius * 0.1f
@@ -117,8 +119,11 @@ class Ball(val ctx: Context) {
 
     private val eye = Vector2() to Vector2()
 
+    val c = Color()
+    fun alphaColor(color: Color): Color = c.set(color).also { it.a = alpha }
+
     fun drawEyes(k: Float, center: Vector2) {
-        ctx.sd.setColor(Color.GRAY)
+        ctx.sd.setColor(alphaColor(Color.GRAY))
         ctx.sd.line(
             eye.first.set(eyeL.first).scl(k).add(center),
             eye.second.set(eyeL.second).scl(k).add(center),

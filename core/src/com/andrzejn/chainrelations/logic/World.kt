@@ -3,6 +3,7 @@ package com.andrzejn.chainrelations.logic
 import aurelienribon.tweenengine.Timeline
 import aurelienribon.tweenengine.Tween
 import com.andrzejn.chainrelations.Context
+import com.andrzejn.chainrelations.TW_ALPHA
 import com.andrzejn.chainrelations.TW_EYE_HK
 import com.badlogic.gdx.math.Vector2
 import java.util.*
@@ -66,7 +67,7 @@ class World(val ctx: Context) {
     }
 
     fun ballPointedBy(v: Vector2): Ball? {
-        return balls.firstOrNull { it.coord.dst(v) < ctx.wc.radius }
+        return balls.firstOrNull { !it.inDeath && it.coord.dst(v) < ctx.wc.radius }
     }
 
     fun addConnector(from: BaseSocket, otherBall: Ball): Boolean {
@@ -83,15 +84,24 @@ class World(val ctx: Context) {
             ballsToClear.add(fromBall)
         if (otherBall.sockets.none { it.conn == null })
             ballsToClear.add(otherBall)
-        if (ballsToClear.size == 0) {
+        if (ballsToClear.isEmpty()) {
             connectors.add(con)
             return true
+        }
+        ballsToClear.forEach { b ->
+            Timeline.createSequence()
+                .push(Tween.call { _, _ -> b.inDeath = true })
+                .push(Tween.to(b, TW_ALPHA, 1f).target(0f))
+                //.push(Tween.mark())
+                .push(Tween.call { _, _ -> b.reset() })
+                .push(Tween.to(b, TW_ALPHA, 1f).target(1f))
+                .setCallback { _, _ -> b.inDeath = false }
+                .start(ctx.tweenManager)
         }
         ballsToClear.flatMap { it.sockets }.mapNotNull { it.conn }.toMutableSet().also { it.add(con) }.forEach {
             it.clear()
             connectors.remove(it)
         }
-        ballsToClear.forEach { it.reset() }
         return true
     }
 
@@ -115,10 +125,10 @@ class World(val ctx: Context) {
 
     fun blinkRandomBall(ballBlinked: (Ball) -> Unit) {
         val t = Calendar.getInstance().timeInMillis
-        if (t - lastBlinkTime < 2000)
+        if (t - lastBlinkTime < 3000)
             return
         lastBlinkTime = t
-        val b = balls.filter { !it.inBlink }.random()
+        val b = balls.filter { !it.inBlink && !it.inDeath }.random()
         Timeline.createSequence()
             .push(Tween.call { _, _ -> b.inBlink = true })
             .push(Tween.to(b, TW_EYE_HK, 0.3f).target(0f))
