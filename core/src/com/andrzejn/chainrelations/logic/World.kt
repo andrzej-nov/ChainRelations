@@ -47,6 +47,7 @@ class World(val ctx: Context) {
             calcRepulsions(balls)
             balls.forEach {
                 ctx.wc.applyBorderForce(it)
+                it.applyAccelerometers()
                 it.moveBy(delta, calcSteps)
                 clampCoord(it.coord, ctx.wc.radius)
             }

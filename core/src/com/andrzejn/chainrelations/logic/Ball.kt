@@ -1,6 +1,7 @@
 package com.andrzejn.chainrelations.logic
 
 import com.andrzejn.chainrelations.Context
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import kotlin.math.PI
@@ -11,7 +12,7 @@ class Ball(val ctx: Context) {
     val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this) }
     val sockets: List<BaseSocket> = inSock.toList<BaseSocket>().plus(outSock)
 
-    val maxColor: Int = 7 // In range 6..7. 5 is too easy
+    val maxColor: Int = 6 // In range 6..7. 5 is too easy
 
     // force[0] is border barrier force, then go connectors attraction, then repulsions from other balls
     val force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
@@ -49,6 +50,9 @@ class Ball(val ctx: Context) {
             that.addForce(f.scl(-1f))
         }
     }
+
+    fun applyAccelerometers() =
+        force[0].add(Gdx.input.accelerometerY * ctx.wc.radius / 5, -Gdx.input.accelerometerX * ctx.wc.radius / 5)
 
     val drawCoord = Vector2(-1f, -1f)
 

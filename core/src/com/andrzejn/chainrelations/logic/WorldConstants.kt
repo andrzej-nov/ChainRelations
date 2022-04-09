@@ -27,7 +27,7 @@ class WorldConstants(val ballsCount: Int) {
         radSquared = radius * radius
         sideDist = radius * distMult
         borderDist = 4f * sideDist * sideDist
-        barrierForce = 15f * radius
+        barrierForce = 17f * radius
         baseRepulsion = 11f * radius * borderDist
         forceLimit = 0.8f * radius
         attraction = 6f * radius

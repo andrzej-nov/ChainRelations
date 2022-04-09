@@ -12,10 +12,10 @@ import ktx.app.KtxScreen
 import ktx.math.minus
 
 class GameScreen(val ctx: Context) : KtxScreen {
-    val maxConnLen: Float = 4f // Maximum connector length, in ball radiuses
+    val maxConnLen: Float = 4.5f // Maximum connector length, in ball radiuses
 
     init { // ballsCount n range 20..50
-        ctx.wc = WorldConstants(50).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
+        ctx.wc = WorldConstants(20).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
     }
 
     val world = World(ctx) // Create World after WorldConstants
@@ -141,7 +141,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         private fun setDragFrom(v: Vector2) {
             val pB = pointedBall ?: return
             val v1 = v.minus(pointedBallCenter).scl(0.5f)
-            val dF = pB.sockets.firstOrNull { it.conn == null && it.coord.epsilonEquals(v1, ctx.wc.radius * 0.15f) }
+            val dF = pB.sockets.firstOrNull { it.conn == null && it.coord.epsilonEquals(v1, ctx.wc.radius * 0.3f) }
             dragFrom = dF
             if (dF == null)
                 return
@@ -166,7 +166,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         private fun setDragTo(v: Vector2) {
             val dF = dragFrom ?: return
             val dragFromCoord = dF.absCoord()
-            dragTo = v.sub(dragFromCoord).clamp(0f, 4f * ctx.wc.radius).add(dragFromCoord)
+            dragTo = v.sub(dragFromCoord).clamp(0f, maxConnLen * ctx.wc.radius).add(dragFromCoord)
         }
     }
 
