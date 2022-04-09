@@ -6,7 +6,7 @@ import ktx.math.plus
 import kotlin.random.Random
 
 class World(val ctx: Context) {
-    val balls = List(ctx.wc.ballsCount) { Ball(ctx).also { it.setSocketCoords() } }
+    val balls = List(ctx.wc.ballsCount) { Ball(ctx).also { it.setElementCoords() } }
     val connectors = mutableListOf<Connector>()
 
     init {
@@ -24,7 +24,7 @@ class World(val ctx: Context) {
         ctx.wc.setValues(width, height)
         balls.forEach {
             it.coord.scl(kx, ky)
-            it.setSocketCoords()
+            it.setElementCoords(true)
         }
         connectors.forEach {
             it.attraction = ctx.wc.attraction
@@ -98,8 +98,8 @@ class World(val ctx: Context) {
     fun drawConnectors() = connectors.forEach {
         ctx.sd.setColor(ctx.dark[it.color])
         ctx.sd.line(
-            it.inSocket.coord.plus(it.inSocket.ball.coord),
-            it.outSocket.coord.plus(it.outSocket.ball.coord),
+            it.inSocket.absDrawCoord(),
+            it.outSocket.absDrawCoord(),
             ctx.wc.lineWidth * 2
         )
     }

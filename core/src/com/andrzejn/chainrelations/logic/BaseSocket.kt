@@ -21,6 +21,8 @@ abstract class BaseSocket(val ctx: Context, val ball: Ball) {
 
     fun absCoord(): Vector2 = v.set(coord).add(ball.coord)
 
+    fun absDrawCoord(): Vector2 = v.set(coord).add(ball.drawCoord)
+
     open fun draw(k: Float, center: Vector2) {
         ctx.sd.setColor(ctx.light[color])
         if (conn != null)

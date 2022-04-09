@@ -155,9 +155,9 @@ class Context(
         Color(0xd1b153ff.toInt()),
         Color(0x6d9edbff),
         Color(0x8ab775ff.toInt()),
-        Color(0xb250ffff.toInt()),
+        Color(0xc260ffff.toInt()),
         Color(0xd68a00ff.toInt()),
-        Color(0xcc4125ff.toInt()),
+        Color(0xdc4125ff.toInt()),
         Color(0x20bfbfff),
     )
 

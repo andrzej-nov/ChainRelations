@@ -49,23 +49,23 @@ class GameScreen(val ctx: Context) : KtxScreen {
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limit circle.
-            ctx.sd.filledCircle(dF.absCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
+            ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
         world.drawConnectors()
         world.balls.filter { dF != null || it != pB }.forEach {
-            setBallSpriteBounds(it.coord, 1f)
+            setBallSpriteBounds(it.drawCoord, 1f)
             ball.color =
                 if (dF != null && suitableTargets?.contains(it) == true) ctx.dark[dF.color] else Color.GRAY
             ball.draw(ctx.batch)
-            it.drawSockets()
+            it.drawElements()
         }
         ball.color = Color.GRAY
         if (pB != null && dF == null) { // Draw large pointed ball to pick a connector and start drag
             setBallSpriteBounds(pointedBallCenter, 2f)
             ball.draw(ctx.batch)
-            pB.drawSockets(2f, pointedBallCenter)
+            pB.drawElements(2f, pointedBallCenter)
         }
         if (dF != null && dragTo.x > 0)
-            ctx.sd.line(dF.absCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
+            ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
         ctx.batch.end()
     }
 
@@ -84,7 +84,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         pointedBall = b
         if (b == null)
             return
-        pointedBallCenter.set(b.coord)
+        pointedBallCenter.set(b.drawCoord)
         world.clampCoord(pointedBallCenter, ctx.wc.radius * 2)
     }
 
