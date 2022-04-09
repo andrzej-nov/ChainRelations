@@ -91,10 +91,15 @@ class World(val ctx: Context) {
         ballsToClear.forEach { b ->
             Timeline.createSequence()
                 .push(Tween.call { _, _ -> b.inDeath = true })
+                .beginParallel()
                 .push(Tween.to(b, TW_ALPHA, 1f).target(0f))
-                //.push(Tween.mark())
+                .push(Tween.to(b, TW_EYE_HK, 0.5f).target(0f))
+                .end()
                 .push(Tween.call { _, _ -> b.reset() })
+                .beginParallel()
                 .push(Tween.to(b, TW_ALPHA, 1f).target(1f))
+                .push(Tween.to(b, TW_EYE_HK, 1f).target(1f))
+                .end()
                 .setCallback { _, _ -> b.inDeath = false }
                 .start(ctx.tweenManager)
         }
@@ -123,7 +128,7 @@ class World(val ctx: Context) {
 
     private var lastBlinkTime: Long = 0
 
-    fun blinkRandomBall(ballBlinked: (Ball) -> Unit) {
+    fun blinkRandomBall(ballBlinked: () -> Unit) {
         val t = Calendar.getInstance().timeInMillis
         if (t - lastBlinkTime < 3000)
             return
@@ -136,7 +141,7 @@ class World(val ctx: Context) {
             .push(Tween.call { _, _ ->
                 b.inBlink = false
                 b.recolorRandomSocket()
-                ballBlinked(b)
+                ballBlinked()
             })
             .start(ctx.tweenManager)
     }

@@ -42,7 +42,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         input.inputProcessor = null
     }
 
-    fun ballBlinked(b: Ball) {
+    fun ballBlinked() {
         calcSuitableTargets(pointedBall, dragFrom)
         if (suitableTargets?.isEmpty() == true)
             cleanDragState(false)
@@ -51,9 +51,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
     override fun render(delta: Float) {
         super.render(delta)
         world.moveBalls(delta)
-        world.blinkRandomBall { b -> ballBlinked(b) }
+        world.blinkRandomBall { b -> ballBlinked() }
         ctx.tweenManager.update(delta)
-        world.balls.filter { it.inBlink }.forEach { it.setEyeCoords() }
+        world.balls.filter { it.inBlink || it.inDeath }.forEach { it.setEyeCoords() }
         ctx.batch.begin()
         val dF = dragFrom
         val pB = pointedBall
@@ -134,16 +134,13 @@ class GameScreen(val ctx: Context) : KtxScreen {
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             val v = ctx.pointerPosition(input.x, input.y)
             val dF = dragFrom
-            var connectorAdded = false
             if (dF != null) {
                 setDragTo(v)
                 val otherBall = world.ballPointedBy(dragTo)
                 if (otherBall != null && suitableTargets?.contains(otherBall) == true)
-                    connectorAdded = world.addConnector(dF, otherBall)
+                    world.addConnector(dF, otherBall)
             }
-            val st = suitableTargets
-            if (connectorAdded || st == null || st.isEmpty())
-                cleanDragState(true)
+            cleanDragState(true)
             return super.touchUp(screenX, screenY, pointer, button)
         }
 
