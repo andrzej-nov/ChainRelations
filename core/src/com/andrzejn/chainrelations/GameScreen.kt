@@ -15,7 +15,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
     val maxConnLen: Float = 4.5f // Maximum connector length, in ball radiuses
 
     init { // ballsCount n range 20..50
-        ctx.wc = WorldConstants(20).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
+        ctx.wc = WorldConstants(50).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
     }
 
     val world = World(ctx) // Create World after WorldConstants
@@ -51,7 +51,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
     override fun render(delta: Float) {
         super.render(delta)
         world.moveBalls(delta)
-        world.blinkRandomBall { b -> ballBlinked() }
+        world.blinkRandomBall { ballBlinked() }
         ctx.tweenManager.update(delta)
         world.balls.filter { it.inBlink || it.inDeath }.forEach { it.setEyeCoords() }
         ctx.batch.begin()

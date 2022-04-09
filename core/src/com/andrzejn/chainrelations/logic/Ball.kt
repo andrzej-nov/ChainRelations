@@ -13,7 +13,7 @@ class Ball(val ctx: Context) {
     val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this) }
     val sockets: List<BaseSocket> = inSock.toList<BaseSocket>().plus(outSock)
 
-    val maxColor: Int = 6 // In range 6..7. 5 is too easy
+    val maxColor: Int = 7 // In range 6..7. 5 is too easy
 
     // force[0] is border barrier force, then go connectors attraction, then repulsions from other balls
     val force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }

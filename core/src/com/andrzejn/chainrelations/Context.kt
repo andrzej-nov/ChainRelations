@@ -3,6 +3,7 @@ package com.andrzejn.chainrelations
 import aurelienribon.tweenengine.Tween
 import aurelienribon.tweenengine.TweenManager
 import com.andrzejn.chainrelations.logic.Ball
+import com.andrzejn.chainrelations.logic.BallAccessor
 import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager

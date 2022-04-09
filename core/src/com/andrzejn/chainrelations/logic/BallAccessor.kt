@@ -1,10 +1,9 @@
-package com.andrzejn.chainrelations
+package com.andrzejn.chainrelations.logic
 
 import aurelienribon.tweenengine.TweenAccessor
-import com.andrzejn.chainrelations.logic.Ball
 
-const val TW_EYE_HK = 1
-const val TW_ALPHA = 2
+const val TW_EYE_HK: Int = 1
+const val TW_ALPHA: Int = 2
 
 /**
  * Used by the Tween Engine to access field properties
