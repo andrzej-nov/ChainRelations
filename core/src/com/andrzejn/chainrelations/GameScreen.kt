@@ -42,15 +42,24 @@ class GameScreen(val ctx: Context) : KtxScreen {
         input.inputProcessor = null
     }
 
+    fun ballBlinked(b: Ball) {
+        calcSuitableTargets(pointedBall, dragFrom)
+        if (suitableTargets?.isEmpty() == true)
+            cleanDragState(false)
+    }
+
     override fun render(delta: Float) {
         super.render(delta)
         world.moveBalls(delta)
+        world.blinkRandomBall { b -> ballBlinked(b) }
+        ctx.tweenManager.update(delta)
         ctx.batch.begin()
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limit circle.
             ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
         world.drawConnectors()
+        world.balls.filter { it.inBlink }.forEach { it.setEyeCoords() }
         world.balls.filter { dF != null || it != pB }.forEach {
             setBallSpriteBounds(it.drawCoord, 1f)
             ball.color =
@@ -125,16 +134,16 @@ class GameScreen(val ctx: Context) : KtxScreen {
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             val v = ctx.pointerPosition(input.x, input.y)
             val dF = dragFrom
+            var connectorAdded = false
             if (dF != null) {
                 setDragTo(v)
                 val otherBall = world.ballPointedBy(dragTo)
                 if (otherBall != null && suitableTargets?.contains(otherBall) == true)
-                    world.addConnector(dF, otherBall)
+                    connectorAdded = world.addConnector(dF, otherBall)
             }
-            pointedBall = null
-            dragFrom = null
-            suitableTargets = null
-            dragTo.set(-1f, -1f)
+            val st = suitableTargets
+            if (connectorAdded || st == null || st.isEmpty())
+                cleanDragState(true)
             return super.touchUp(screenX, screenY, pointer, button)
         }
 
@@ -145,29 +154,46 @@ class GameScreen(val ctx: Context) : KtxScreen {
             dragFrom = dF
             if (dF == null)
                 return
-            val dragFromCoord = dF.absCoord()
-            suitableTargets =
-                world.balls.filter { b ->
-                    b != pB && b.coord.dst(dragFromCoord) < (maxConnLen + 1) * ctx.wc.radius // other balls in range
-                            && b.sockets.mapNotNull { s -> s.conn }
-                        .none { c -> c.inSocket.ball == pB || c.outSocket.ball == pB }
-                            // not connected to the pointed ball yet
-                            && (if (dF is InSocket) b.outSock else b.inSock)
-                        .any { s ->
-                            s.conn == null && s.color == dF.color && s.absCoord()
-                                .dst(dragFromCoord) < maxConnLen * ctx.wc.radius
-                        } // and matching free connector in range
-                }
-                    .toSet()
-            if (suitableTargets?.size == 0) // No suitable targets, do not start drag from this socket
+            calcSuitableTargets(pB, dF)
+            if (suitableTargets?.isEmpty() == true) // No suitable targets, do not start drag from this socket
                 dragFrom = null
         }
 
         private fun setDragTo(v: Vector2) {
             val dF = dragFrom ?: return
-            val dragFromCoord = dF.absCoord()
+            val dragFromCoord = dF.absDrawCoord()
             dragTo = v.sub(dragFromCoord).clamp(0f, maxConnLen * ctx.wc.radius).add(dragFromCoord)
         }
+    }
+
+    fun cleanDragState(cleanPointedBall: Boolean) {
+        if (cleanPointedBall)
+            pointedBall = null
+        dragFrom = null
+        suitableTargets = null
+        dragTo.set(-1f, -1f)
+    }
+
+    fun calcSuitableTargets(
+        pB: Ball?,
+        dF: BaseSocket?
+    ) {
+        if (pB == null || dF == null)
+            return
+        val dragFromCoord = dF.absDrawCoord()
+        suitableTargets =
+            world.balls.filter { b ->
+                b != pB && b.coord.dst(dragFromCoord) < (maxConnLen + 1) * ctx.wc.radius // other balls in range
+                        && b.sockets.mapNotNull { s -> s.conn }
+                    .none { c -> c.inSocket.ball == pB || c.outSocket.ball == pB }
+                        // not connected to the pointed ball yet
+                        && (if (dF is InSocket) b.outSock else b.inSock)
+                    .any { s ->
+                        s.conn == null && s.color == dF.color && s.absDrawCoord()
+                            .dst(dragFromCoord) < maxConnLen * ctx.wc.radius
+                    } // and matching free connector in range
+            }
+                .toSet()
     }
 
 }

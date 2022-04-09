@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.random.Random
 
 class Ball(val ctx: Context) {
     val inSock: Array<InSocket> = Array(3) { InSocket(ctx, this) }
@@ -31,6 +32,10 @@ class Ball(val ctx: Context) {
         angle = 0f
         val color = (1..maxColor).plus((1..maxColor)).shuffled().iterator()
         sockets.forEach { it.color = color.next() }
+    }
+
+    fun recolorRandomSocket() {
+        sockets.filter { it.conn == null }.random().color = Random.nextInt(maxColor) + 1
     }
 
     fun addForce(f: Vector2) = force[i++].set(f)
@@ -99,13 +104,15 @@ class Ball(val ctx: Context) {
 
     var eyeL = Vector2() to Vector2()
     var eyeR = Vector2() to Vector2()
+    var eyeHk: Float = 1f
+    var inBlink = false
 
     fun setEyeCoords() {
         val len = ctx.wc.radius * 0.1f
-        eyeL.first.set(-2 * len, -2 * len).rotateRad(angle)
-        eyeL.second.set(-2 * len, 3 * len).rotateRad(angle)
-        eyeR.first.set(2 * len, -2 * len).rotateRad(angle)
-        eyeR.second.set(2 * len, 3 * len).rotateRad(angle)
+        eyeL.first.set(-2 * len, -2 * len * eyeHk).rotateRad(angle)
+        eyeL.second.set(-2 * len, 3 * len * eyeHk).rotateRad(angle)
+        eyeR.first.set(2 * len, -2 * len * eyeHk).rotateRad(angle)
+        eyeR.second.set(2 * len, 3 * len * eyeHk).rotateRad(angle)
     }
 
     private val eye = Vector2() to Vector2()

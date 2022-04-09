@@ -1,8 +1,11 @@
 package com.andrzejn.chainrelations.logic
 
+import aurelienribon.tweenengine.Timeline
+import aurelienribon.tweenengine.Tween
 import com.andrzejn.chainrelations.Context
+import com.andrzejn.chainrelations.TW_EYE_HK
 import com.badlogic.gdx.math.Vector2
-import ktx.math.plus
+import java.util.*
 import kotlin.random.Random
 
 class World(val ctx: Context) {
@@ -66,20 +69,15 @@ class World(val ctx: Context) {
         return balls.firstOrNull { it.coord.dst(v) < ctx.wc.radius }
     }
 
-    fun addConnector(from: BaseSocket, otherBall: Ball) {
+    fun addConnector(from: BaseSocket, otherBall: Ball): Boolean {
         val fromBall = from.ball
-        val con = if (from is InSocket)
-            Connector(
-                from,
-                otherBall.outSock.first { it.conn == null && it.color == from.color },
-                ctx.wc.attraction
-            )
-        else
-            Connector(
-                otherBall.inSock.first { it.conn == null && it.color == from.color },
-                from as OutSocket,
-                ctx.wc.attraction
-            )
+        val con = if (from is InSocket) {
+            val outSocket = otherBall.outSock.firstOrNull { it.conn == null && it.color == from.color } ?: return false
+            Connector(from, outSocket, ctx.wc.attraction)
+        } else {
+            val inSocket = otherBall.inSock.firstOrNull() { it.conn == null && it.color == from.color } ?: return false
+            Connector(inSocket, from as OutSocket, ctx.wc.attraction)
+        }
         val ballsToClear = mutableListOf<Ball>()
         if (fromBall.sockets.none { it.conn == null })
             ballsToClear.add(fromBall)
@@ -87,13 +85,14 @@ class World(val ctx: Context) {
             ballsToClear.add(otherBall)
         if (ballsToClear.size == 0) {
             connectors.add(con)
-            return
+            return true
         }
         ballsToClear.flatMap { it.sockets }.mapNotNull { it.conn }.toMutableSet().also { it.add(con) }.forEach {
             it.clear()
             connectors.remove(it)
         }
         ballsToClear.forEach { it.reset() }
+        return true
     }
 
     fun drawConnectors() = connectors.forEach {
@@ -110,5 +109,25 @@ class World(val ctx: Context) {
             it.coord.add(ctx.wc.randomCoordHit, ctx.wc.randomCoordHit)
             clampCoord(it.coord, ctx.wc.radius)
         }
+    }
+
+    private var lastBlinkTime: Long = 0
+
+    fun blinkRandomBall(ballBlinked: (Ball) -> Unit) {
+        val t = Calendar.getInstance().timeInMillis
+        if (t - lastBlinkTime < 2000)
+            return
+        lastBlinkTime = t
+        val b = balls.filter { !it.inBlink }.random()
+        Timeline.createSequence()
+            .push(Tween.call { _, _ -> b.inBlink = true })
+            .push(Tween.to(b, TW_EYE_HK, 0.3f).target(0f))
+            .push(Tween.to(b, TW_EYE_HK, 0.2f).target(1f))
+            .push(Tween.call { _, _ ->
+                b.inBlink = false
+                b.recolorRandomSocket()
+                ballBlinked(b)
+            })
+            .start(ctx.tweenManager)
     }
 }

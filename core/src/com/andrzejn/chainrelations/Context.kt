@@ -1,6 +1,8 @@
 package com.andrzejn.chainrelations
 
+import aurelienribon.tweenengine.Tween
 import aurelienribon.tweenengine.TweenManager
+import com.andrzejn.chainrelations.logic.Ball
 import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -50,7 +52,7 @@ class Context(
     lateinit var wc: WorldConstants
 
     init { // Need to specify which objects' properties will be used for animations
-        //Tween.registerAccessor(Sprite::class.java, SpriteAccessor())
+        Tween.registerAccessor(Ball::class.java, BallAccessor())
     }
 
     /**
