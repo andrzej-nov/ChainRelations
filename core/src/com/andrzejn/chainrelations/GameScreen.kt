@@ -10,12 +10,19 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import ktx.app.KtxScreen
 import ktx.math.minus
+import java.util.*
 
 class GameScreen(val ctx: Context) : KtxScreen {
     val maxConnLen: Float = ctx.gs.maxRadius // Maximum connector length, in ball radiuses
 
     init { // ballsCount n range 20..50
-        ctx.wc = WorldConstants(ctx.gs.ballsCount).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
+        ctx.setTheme()
+        ctx.wc = WorldConstants(ctx.gs.ballsCount).also {
+            it.setValues(
+                Gdx.graphics.width.toFloat(),
+                Gdx.graphics.height.toFloat()
+            )
+        }
     }
 
     val world = World(ctx) // Create World after WorldConstants
@@ -26,20 +33,41 @@ class GameScreen(val ctx: Context) : KtxScreen {
      */
     private val ia = IAdapter()
 
+    private var timeStart: Long = 0
+
     override fun show() {
         super.show()
         input.inputProcessor = ia
+        timeStart = Calendar.getInstance().timeInMillis
     }
 
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         ctx.setCamera(width, height)
         world.resize(width.toFloat(), height.toFloat())
+        ctx.score.setCoords(height / 30)
     }
 
     override fun hide() {
         super.hide()
         input.inputProcessor = null
+        updateInGameDuration()
+        ctx.score.saveRecords()
+    }
+
+    /**
+     * Invoked when the screen is about to close, for any reason.
+     * Update the in-game time.
+     */
+    override fun pause() {
+        updateInGameDuration()
+        ctx.score.saveRecords()
+        super.pause()
+    }
+
+    private fun updateInGameDuration() {
+        ctx.gs.inGameDuration += Calendar.getInstance().timeInMillis - timeStart
+        timeStart = Calendar.getInstance().timeInMillis
     }
 
     fun ballBlinked() {
@@ -75,6 +103,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
         if (dF != null && dragTo.x > 0)
             ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
+        ctx.score.draw(ctx.batch)
         ctx.batch.end()
     }
 

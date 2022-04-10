@@ -4,6 +4,7 @@ import aurelienribon.tweenengine.Tween
 import aurelienribon.tweenengine.TweenManager
 import com.andrzejn.chainrelations.helper.BallAccessor
 import com.andrzejn.chainrelations.helper.GameSettings
+import com.andrzejn.chainrelations.helper.Score
 import com.andrzejn.chainrelations.logic.Ball
 import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
@@ -11,8 +12,10 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.TextureAtlasLoader
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.setMaxTextureSize
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import ktx.assets.Asset
@@ -55,6 +58,8 @@ class Context(
 
     val gs = GameSettings()
 
+    val score = Score(this)
+
     init { // Need to specify which objects' properties will be used for animations
         Tween.registerAccessor(Ball::class.java, BallAccessor())
     }
@@ -89,16 +94,6 @@ class Context(
         camera.unproject(v)
         return Vector2(v.x, v.y)
     }
-
-    /**
-     * Shortened accessor to the screen viewportWidth
-     */
-    val viewportWidth: Float get() = camera.viewportWidth
-
-    /**
-     * Shortened accessor to the screen viewportHeight
-     */
-    val viewportHeight: Float get() = camera.viewportHeight
 
     /**
      * Initialize the camera, batch and drawer that draw screens
@@ -137,6 +132,7 @@ class Context(
 
     val white: TextureRegion get() = texture("white")
     val ball: TextureRegion get() = texture("ball")
+    val logo: TextureRegion get() = texture("logo")
 
     /**
      * Create a bitmap font with given size, base color etc. from the provided TrueType font.
@@ -144,9 +140,14 @@ class Context(
      */
     fun createFont(height: Int): BitmapFont {
         with(FreeTypeFontGenerator(Gdx.files.internal("ADYS-Bold_V5.ttf"))) {
+            setMaxTextureSize(2048) // Required for same devices like Xiaomi, where the default 1024 causes garbled fonts
             val font = generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
                 it.size = height
                 it.color = Color.WHITE
+                it.minFilter = Texture.TextureFilter.Linear
+                it.magFilter = Texture.TextureFilter.Linear
+                it.characters =
+                    "\u0000ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890\"!`?'.,;:()[]{}<>|/@\\^$€-%+=#_&~*"
             })
             dispose()
             return font
@@ -180,6 +181,54 @@ class Context(
         Color(0x85200cff.toInt()),
         Color(0x286d6dff)
     )
+
+    data class Theme(
+        val screenBackground: Color,
+        val settingSelection: Color,
+        val settingItem: Color,
+        val settingSeparator: Color,
+        val gameboardBackground: Color,
+        val creditsText: Color,
+        val scorePoints: Color,
+        val scoreMoves: Color,
+        val light: Array<Color>,
+        val dark: Array<Color>
+    )
+
+    private val lt: Theme = Theme(
+        screenBackground = Color.GRAY,
+        settingSelection = Color.LIGHT_GRAY,
+        settingItem = Color.DARK_GRAY,
+        settingSeparator = Color.DARK_GRAY,
+        gameboardBackground = Color.LIGHT_GRAY,
+        creditsText = Color.NAVY,
+        scorePoints = Color(Color.CHARTREUSE).also { it.a = 0.7f },
+        scoreMoves = Color(Color.GOLD).also { it.a = 0.7f },
+        dark = this.light,
+        light = this.dark
+    )
+
+    private val dk: Theme = Theme(
+        screenBackground = Color.DARK_GRAY,
+        settingSelection = Color.GRAY,
+        settingItem = Color.LIGHT_GRAY,
+        settingSeparator = Color.LIGHT_GRAY,
+        gameboardBackground = Color.BLACK,
+        creditsText = Color.WHITE,
+        scorePoints = Color(Color.CHARTREUSE).also { it.a = 0.7f },
+        scoreMoves = Color(Color.GOLD).also { it.a = 0.7f },
+        dark = this.dark,
+        light = this.light
+    )
+
+    lateinit var theme: Theme
+
+    /**
+     * Set color theme according to current game setting value
+     */
+    fun setTheme() {
+        theme = if (gs.isDarkTheme) dk else lt
+    }
 
 
     /**

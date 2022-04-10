@@ -164,3 +164,8 @@ lighttheme
   xy: 570, 815
   size: 150, 150
   index: -1
+ logo
+   rotate: false
+   xy: 0, 970
+   size: 567,168
+   index: -1

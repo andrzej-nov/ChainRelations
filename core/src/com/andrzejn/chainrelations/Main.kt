@@ -21,11 +21,14 @@ class Main : KtxGame<KtxScreen>() {
     override fun create() {
         graphics.isContinuousRendering = true // This game does not require continuous screen rendering as it is
         // mostly static. So let's switch to rendering on demand, to save CPU resources.
+        ctx.gs.reset()
+        ctx.setTheme()
         ctx.reloadAtlas()
         ctx.initBatch() // OpegGL batch objects are heavy. Usually you just need to create one or few of them
         // on the app start and retain them until the end
         addScreen(GameScreen(ctx))
         setScreen<GameScreen>()
+        ctx.score.reset()
         graphics.requestRendering() // Request first screen redraw.
     }
 

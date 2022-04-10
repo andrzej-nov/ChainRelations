@@ -79,6 +79,7 @@ class World(val ctx: Context) {
             val inSocket = otherBall.inSock.firstOrNull() { it.conn == null && it.color == from.color } ?: return false
             Connector(inSocket, from as OutSocket, ctx.wc.attraction)
         }
+        ctx.score.incrementMoves()
         val ballsToClear = mutableListOf<Ball>()
         if (fromBall.sockets.none { it.conn == null })
             ballsToClear.add(fromBall)
@@ -88,6 +89,7 @@ class World(val ctx: Context) {
             connectors.add(con)
             return true
         }
+        ctx.score.addPoints(ballsToClear.size)
         ballsToClear.forEach { b ->
             Timeline.createSequence()
                 .push(Tween.call { _, _ -> b.inDeath = true })
