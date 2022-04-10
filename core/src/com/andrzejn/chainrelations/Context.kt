@@ -5,6 +5,7 @@ import aurelienribon.tweenengine.TweenManager
 import com.andrzejn.chainrelations.helper.BallAccessor
 import com.andrzejn.chainrelations.helper.GameSettings
 import com.andrzejn.chainrelations.helper.Score
+import com.andrzejn.chainrelations.helper.SpriteAccessor
 import com.andrzejn.chainrelations.logic.Ball
 import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
@@ -62,6 +63,7 @@ class Context(
 
     init { // Need to specify which objects' properties will be used for animations
         Tween.registerAccessor(Ball::class.java, BallAccessor())
+        Tween.registerAccessor(Sprite::class.java, SpriteAccessor())
     }
 
     /**
@@ -137,6 +139,8 @@ class Context(
     val play: TextureRegion get() = texture("play")
     val exit: TextureRegion get() = texture("poweroff")
     val help: TextureRegion get() = texture("help")
+    val hit: TextureRegion get() = texture("cancel")
+    val hand: TextureRegion get() = texture("hand")
 
     /**
      * Create a bitmap font with given size, base color etc. from the provided TrueType font.

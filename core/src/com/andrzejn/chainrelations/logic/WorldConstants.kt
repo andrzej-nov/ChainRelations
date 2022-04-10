@@ -63,6 +63,6 @@ class WorldConstants(val ballsCount: Int) {
         }
     }
 
-    val randomCoordHit: Float get() = Random.nextFloat() * 2 * radius - radius
+    val randomCoordHit: Float get() = Random.nextFloat() * 3 * radius - 1.5f * radius
 
 }

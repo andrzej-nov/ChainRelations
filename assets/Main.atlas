@@ -4,6 +4,11 @@ size: 720, 969
 format: RGBA8888
 filter: MipMap, MipMap
 repeat: none
+hand
+  rotate: false
+  xy: 0, 0
+  size: 134, 150
+  index: -1
 black
   rotate: false
   xy: 20, 230
@@ -69,7 +74,7 @@ poweroff
   xy: 330, 370
   size: 76, 76
   index: -1
-nail
+mail
   rotate: false
   xy: 5, 460
   size: 76, 76
