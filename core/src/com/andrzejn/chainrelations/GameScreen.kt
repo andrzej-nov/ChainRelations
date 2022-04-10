@@ -12,10 +12,10 @@ import ktx.app.KtxScreen
 import ktx.math.minus
 
 class GameScreen(val ctx: Context) : KtxScreen {
-    val maxConnLen: Float = 4.5f // Maximum connector length, in ball radiuses
+    val maxConnLen: Float = ctx.gs.maxRadius // Maximum connector length, in ball radiuses
 
     init { // ballsCount n range 20..50
-        ctx.wc = WorldConstants(50).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
+        ctx.wc = WorldConstants(ctx.gs.ballsCount).also { it.setValues(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }
     }
 
     val world = World(ctx) // Create World after WorldConstants

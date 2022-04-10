@@ -1,6 +1,7 @@
-package com.andrzejn.chainrelations.logic
+package com.andrzejn.chainrelations.helper
 
 import aurelienribon.tweenengine.TweenAccessor
+import com.andrzejn.chainrelations.logic.Ball
 
 const val TW_EYE_HK: Int = 1
 const val TW_ALPHA: Int = 2

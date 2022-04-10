@@ -2,8 +2,9 @@ package com.andrzejn.chainrelations
 
 import aurelienribon.tweenengine.Tween
 import aurelienribon.tweenengine.TweenManager
+import com.andrzejn.chainrelations.helper.BallAccessor
+import com.andrzejn.chainrelations.helper.GameSettings
 import com.andrzejn.chainrelations.logic.Ball
-import com.andrzejn.chainrelations.logic.BallAccessor
 import com.andrzejn.chainrelations.logic.WorldConstants
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -51,6 +52,8 @@ class Context(
     val tweenManager: TweenManager = TweenManager()
 
     lateinit var wc: WorldConstants
+
+    val gs = GameSettings()
 
     init { // Need to specify which objects' properties will be used for animations
         Tween.registerAccessor(Ball::class.java, BallAccessor())
