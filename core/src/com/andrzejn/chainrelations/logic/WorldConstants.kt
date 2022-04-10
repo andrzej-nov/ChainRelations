@@ -6,6 +6,7 @@ import kotlin.math.min
 import kotlin.random.Random
 
 class WorldConstants(val ballsCount: Int) {
+    var fontHeight: Int = 0
     val distMult = 1.2f
     var radius: Float = 0f
     var lineWidth = 0f
@@ -18,10 +19,13 @@ class WorldConstants(val ballsCount: Int) {
     var attraction: Float = 0f
     var width: Float = 1f
     var height: Float = 1f
+    var buttonSize: Float = 0f
 
     fun setValues(w: Float, h: Float) {
         width = w
         height = h
+        fontHeight = (h / 30).toInt()
+        buttonSize = w / 20f
         radius = calcRadius()
         lineWidth = radius / 20f
         radSquared = radius * radius
@@ -34,8 +38,8 @@ class WorldConstants(val ballsCount: Int) {
     }
 
     private fun calcRadius(): Float {
-        val minSide = min(width, height)
-        val maxSide = max(width, height)
+        val minSide = min(width - 2 * buttonSize, height)
+        val maxSide = max(width - 2 * buttonSize, height)
         var count = 1
         while (true) {
             val r = minSide / count
@@ -52,8 +56,8 @@ class WorldConstants(val ballsCount: Int) {
 
     fun applyBorderForce(b: Ball) {
         with(b.force[0]) {
-            if (b.coord.x < sideDist) x += barrierForce
-            else if (b.coord.x > width - sideDist) x -= barrierForce
+            if (b.coord.x < sideDist + buttonSize) x += barrierForce
+            else if (b.coord.x > width - sideDist - buttonSize) x -= barrierForce
             if (b.coord.y < sideDist) y += barrierForce
             else if (b.coord.y > height - sideDist) y -= barrierForce
         }

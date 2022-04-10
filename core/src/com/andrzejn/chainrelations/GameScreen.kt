@@ -27,6 +27,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
 
     val world = World(ctx) // Create World after WorldConstants
     val ball = Sprite(ctx.ball)
+    val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
+    val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
+    val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
+    val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
 
     /**
      * The input adapter instance for this screen
@@ -45,7 +49,13 @@ class GameScreen(val ctx: Context) : KtxScreen {
         super.resize(width, height)
         ctx.setCamera(width, height)
         world.resize(width.toFloat(), height.toFloat())
-        ctx.score.setCoords(height / 30)
+        val buttonSize = ctx.wc.buttonSize
+        val fontHeight = ctx.wc.fontHeight
+        ctx.score.setCoords(ctx.wc.fontHeight)
+        play.setBounds(5f, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
+        help.setBounds(5f, fontHeight + buttonSize, buttonSize, buttonSize)
+        exit.setBounds(width - 5f - buttonSize, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
+        home.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
     }
 
     override fun hide() {
@@ -83,6 +93,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
         ctx.tweenManager.update(delta)
         world.balls.filter { it.inBlink || it.inDeath }.forEach { it.setEyeCoords() }
         ctx.batch.begin()
+        ctx.sd.setColor(Color(Color.DARK_GRAY).also { it.a = 0.8f })
+        ctx.sd.filledRectangle(0f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
+        ctx.sd.filledRectangle(ctx.wc.width - ctx.wc.buttonSize - 5f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
+        ctx.sd.filledRectangle(ctx.wc.buttonSize + 5f, 0f, ctx.wc.width - 2 * (ctx.wc.buttonSize + 5f), ctx.wc.fontHeight.toFloat() + 5f)
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limit circle.
@@ -103,6 +117,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
         if (dF != null && dragTo.x > 0)
             ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
+        play.draw(ctx.batch)
+        help.draw(ctx.batch)
+        exit.draw(ctx.batch)
+        home.draw(ctx.batch)
         ctx.score.draw(ctx.batch)
         ctx.batch.end()
     }

@@ -28,7 +28,7 @@ class Main : KtxGame<KtxScreen>() {
         // on the app start and retain them until the end
         addScreen(GameScreen(ctx))
         setScreen<GameScreen>()
-        ctx.score.reset()
+        ctx.score.reset() // TODO Move to newGame()
         graphics.requestRendering() // Request first screen redraw.
     }
 

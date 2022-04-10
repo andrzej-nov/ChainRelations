@@ -14,20 +14,25 @@ class World(val ctx: Context) {
     val connectors = mutableListOf<Connector>()
 
     init {
+        val width = ctx.wc.width - 2 * ctx.wc.radius - 2 * ctx.wc.buttonSize
+        val offsetX = ctx.wc.radius + ctx.wc.buttonSize
+        val height = ctx.wc.height - 2 * ctx.wc.radius
+        val offsetY = ctx.wc.radius
         balls.forEach {
             it.coord.set(
-                Random.nextFloat() * (ctx.wc.width - 2 * ctx.wc.radius) + ctx.wc.radius,
-                Random.nextFloat() * (ctx.wc.height - 2 * ctx.wc.radius) + ctx.wc.radius
+                Random.nextFloat() * width + offsetX,
+                Random.nextFloat() * height + offsetY
             )
         }
     }
 
     fun resize(width: Float, height: Float) {
-        val kx = width / ctx.wc.width
+        val buttonSize = ctx.wc.buttonSize
+        val kx = (width - 2 * buttonSize) / (ctx.wc.width - 2 * buttonSize)
         val ky = height / ctx.wc.height
         ctx.wc.setValues(width, height)
         balls.forEach {
-            it.coord.scl(kx, ky)
+            it.coord.sub(buttonSize, 0f).scl(kx, ky).add(buttonSize, 0f)
             it.setElementCoords(true)
         }
         connectors.forEach {
@@ -61,7 +66,7 @@ class World(val ctx: Context) {
     fun clampCoord(crd: Vector2, rad: Float) {
         val br = rad * 1.1f // don't let the balls touch walls
         crd.set(
-            crd.x.coerceIn(br, ctx.wc.width - br),
+            crd.x.coerceIn(br + ctx.wc.buttonSize, ctx.wc.width - br - ctx.wc.buttonSize),
             crd.y.coerceIn(br, ctx.wc.height - br)
         )
     }
