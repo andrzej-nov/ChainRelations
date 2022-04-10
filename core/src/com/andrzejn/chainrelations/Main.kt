@@ -26,9 +26,10 @@ class Main : KtxGame<KtxScreen>() {
         ctx.reloadAtlas()
         ctx.initBatch() // OpegGL batch objects are heavy. Usually you just need to create one or few of them
         // on the app start and retain them until the end
-        addScreen(GameScreen(ctx))
+        val gs = GameScreen(ctx)
+        addScreen(gs)
         setScreen<GameScreen>()
-        ctx.score.reset() // TODO Move to newGame()
+        gs.newGame(true)
         graphics.requestRendering() // Request first screen redraw.
     }
 
@@ -36,6 +37,7 @@ class Main : KtxGame<KtxScreen>() {
         super.resume()
         ctx.reloadAtlas()
         ctx.initBatch()
+        getScreen<GameScreen>().newGame(true)
     }
 
     /**

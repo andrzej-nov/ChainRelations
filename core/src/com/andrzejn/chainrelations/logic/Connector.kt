@@ -1,6 +1,7 @@
 package com.andrzejn.chainrelations.logic
 
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.StringBuilder
 
 class Connector {
     val inSocket: InSocket
@@ -16,7 +17,7 @@ class Connector {
         outSocket.conn = this
     }
 
-    val color: Int
+    var color: Int
 
     private val f = Vector2()
 
@@ -29,6 +30,11 @@ class Connector {
     fun clear() {
         inSocket.conn = null
         outSocket.conn = null
+    }
+
+    fun serialize(sb: StringBuilder) {
+        sb.append(color).append(inSocket.ball.number, 3).append(inSocket.number)
+            .append(outSocket.ball.number, 3).append(outSocket.number)
     }
 
 }

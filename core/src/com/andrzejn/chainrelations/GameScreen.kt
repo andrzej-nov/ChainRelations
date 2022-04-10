@@ -16,7 +16,15 @@ import ktx.math.minus
 import java.util.*
 
 class GameScreen(val ctx: Context) : KtxScreen {
-    val maxConnLen: Float = ctx.gs.maxRadius // Maximum connector length, in ball radiuses
+    var maxConnLen: Float = ctx.gs.maxRadius // Maximum connector length, in ball radiuses
+
+    val ball = Sprite(ctx.ball)
+    val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
+    val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
+    val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
+    val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
+    val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
+    val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
 
     init { // ballsCount n range 20..50
         ctx.setTheme()
@@ -28,24 +36,25 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
     }
 
-    fun newGame() {
+    var world = World(ctx) // Create World after WorldConstants
+
+    fun newGame(loadSavedGame: Boolean) {
+        maxConnLen = ctx.gs.maxRadius
         ctx.score.reset()
         updateInGameDuration()
         timeStart = Calendar.getInstance().timeInMillis
         world = World(ctx)
+        if (loadSavedGame)
+            try {
+                world.deserialize(ctx.sav.savedGame())
+            } catch (ex: Exception) {
+                // Something wrong. Just recreate new World and start new game
+                world = World(ctx)
+            }
         resize(ctx.wc.width.toInt(), ctx.wc.height.toInt())
     }
 
-    var world = World(ctx) // Create World after WorldConstants
-    val ball = Sprite(ctx.ball)
-    val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
-    val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
-    val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
-    val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
-    val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
-    val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
-
-    /**
+     /**
      * The input adapter instance for this screen
      */
     private val ia = IAdapter()
@@ -102,9 +111,20 @@ class GameScreen(val ctx: Context) : KtxScreen {
 
     var inShowAMove = false
 
+    private var lastGameSave: Long = 0
+
+    fun autoSaveGame() {
+        val t = Calendar.getInstance().timeInMillis
+        if (t - lastGameSave < 5000)
+            return
+        ctx.sav.saveGame(world)
+        lastGameSave = t
+    }
+
     override fun render(delta: Float) {
         super.render(delta)
         world.moveBalls(delta)
+        autoSaveGame()
         if (!inShowAMove)
             world.blinkRandomBall { ballBlinked() }
         ctx.tweenManager.update(delta)
@@ -322,7 +342,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
             }
             cleanDragState(true)
             when {
-                buttonPressed(v, play) -> newGame()
+                buttonPressed(v, play) -> newGame(false)
                 buttonPressed(v, exit) -> Gdx.app.exit()
                 buttonPressed(v, hit) -> world.randomHit()
                 buttonPressed(v, help) -> showAMove()

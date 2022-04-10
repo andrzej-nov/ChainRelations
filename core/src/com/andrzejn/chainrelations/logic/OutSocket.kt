@@ -3,7 +3,7 @@ package com.andrzejn.chainrelations.logic
 import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.math.Vector2
 
-class OutSocket(ctx: Context, ball: Ball) : BaseSocket(ctx, ball) {
+class OutSocket(ctx: Context, ball: Ball, number: Int) : BaseSocket(ctx, ball, number) {
     override val mark = Array(3) { Vector2() }
 
     fun setup(r: Float, len: Float, a: Float) {

@@ -4,19 +4,22 @@ import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.StringBuilder
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.random.Random
 
-class Ball(val ctx: Context) {
-    val inSock: Array<InSocket> = Array(3) { InSocket(ctx, this) }
-    val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this) }
+class Ball(val ctx: Context, var number: Int) {
+    private var cnt = 1
+    val inSock: Array<InSocket> = Array(3) { InSocket(ctx, this, cnt++) }
+    val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this, cnt++) }
     val sockets: List<BaseSocket> = inSock.toList<BaseSocket>().plus(outSock)
 
     val maxColor: Int = ctx.gs.colorsCount // In range 6..7. 5 is too easy
 
     // force[0] is border barrier force, then go connectors attraction, then repulsions from other balls
-    val force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
+    var force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
     val coord: Vector2 = Vector2()
 
     var torque = 0f
@@ -73,6 +76,8 @@ class Ball(val ctx: Context) {
             drawCoord.set(coord)
         if (torque != 0f) {
             angle += torque * delta / (ctx.wc.radius * 50 * calcSteps) // 50 is empirical constant for smooth rotation
+            if (angle < 0) angle += (2 * PI * (floor(-angle / 2 / PI) + 1)).toFloat()
+            if (angle > 2 * PI) angle -= (2 * PI * floor(angle / 2 / PI)).toFloat()
             setElementCoords()
         }
     }
@@ -134,6 +139,22 @@ class Ball(val ctx: Context) {
             eye.second.set(eyeR.second).scl(k).add(center),
             ctx.wc.lineWidth * 3 * k
         )
+    }
+
+    fun serialize(sb: StringBuilder) {
+        sb.append(number, 2).append(coord.x.toInt(), 4).append(coord.y.toInt(), 4).append((angle * 1000).toInt(), 4)
+        sockets.forEach { it.serialize(sb) }
+    }
+
+    fun deserialize(s: String, i: Int): Int {
+        number = s.substring(i..i + 1).toInt()
+        coord.x = s.substring(i + 2..i + 5).toFloat()
+        coord.y = s.substring(i + 6..i + 9).toFloat()
+        angle = s.substring(i + 10..i + 13).toFloat() / 1000
+        var j = i + 14
+        sockets.forEach { j = it.deserialize(s, j) }
+        clearForces()
+        return j
     }
 
 }

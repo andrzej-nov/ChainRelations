@@ -4,7 +4,7 @@ import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.math.Vector2
 import space.earlygrey.shapedrawer.JoinType
 
-class InSocket(ctx: Context, ball: Ball) : BaseSocket(ctx, ball) {
+class InSocket(ctx: Context, ball: Ball, number: Int) : BaseSocket(ctx, ball, number) {
     override val mark = Array(4) { Vector2() }
 
     fun setup(r: Float, len: Float, a: Float) {

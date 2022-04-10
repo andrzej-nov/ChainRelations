@@ -10,7 +10,8 @@ import java.util.*
 import kotlin.random.Random
 
 class World(val ctx: Context) {
-    val balls = List(ctx.wc.ballsCount) { Ball(ctx).also { it.setElementCoords() } }
+    private var cnt = 1
+    var balls = List(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
     val connectors = mutableListOf<Connector>()
 
     init {
@@ -151,5 +152,45 @@ class World(val ctx: Context) {
                 ballBlinked()
             })
             .start(ctx.tweenManager)
+    }
+
+    fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
+        sb.append(ctx.wc.width.toInt(), 4).append(ctx.wc.height.toInt(), 4)
+        sb.append(balls.size, 2)
+        balls.forEach { it.serialize(sb) }
+        sb.append(connectors.size, 3)
+        connectors.forEach { it.serialize(sb) }
+    }
+
+    fun deserialize(s: String): Boolean {
+        val width = s.substring(16..19).toFloat()
+        val height = s.substring(20..23).toFloat()
+        ctx.wc.ballsCount = s.substring(24..25).toInt()
+        ctx.wc.setValues(width, height)
+        balls = List(ctx.wc.ballsCount) { Ball(ctx, 0) }
+        var i = 26
+        val bi = balls.iterator()
+        repeat(ctx.wc.ballsCount) {
+            i = bi.next().deserialize(s, i)
+        }
+        connectors.clear()
+        val connCount = s.substring(i..i + 2).toInt()
+        i += 3
+        repeat(connCount) {
+            val c = s[i].digitToInt()
+            val inBallNumber = s.substring(i + 1..i + 3).toInt()
+            val inSockNumber = s[i + 4].digitToInt()
+            val outBallNumber = s.substring(i + 5..i + 7).toInt()
+            val outSockNumber = s[i + 8].digitToInt()
+            val conn =
+                Connector(balls.first { it.number == inBallNumber }.sockets.first { it.number == inSockNumber } as InSocket,
+                    balls.first { it.number == outBallNumber }.sockets.first { it.number == outSockNumber } as OutSocket,
+                    ctx.wc.attraction
+                )
+            conn.color = c
+            connectors.add(conn)
+            i += 9
+        }
+        return true
     }
 }

@@ -5,7 +5,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-class WorldConstants(val ballsCount: Int) {
+class WorldConstants(var ballsCount: Int) {
     var fontHeight: Int = 0
     val distMult = 1.2f
     var radius: Float = 0f

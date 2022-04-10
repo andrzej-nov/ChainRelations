@@ -3,10 +3,11 @@ package com.andrzejn.chainrelations.logic
 import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.StringBuilder
 
-abstract class BaseSocket(val ctx: Context, val ball: Ball) {
-    var color: Int = 0
+abstract class BaseSocket(val ctx: Context, val ball: Ball, var number: Int) {
     val coord = Vector2()
+    var color: Int = 0
     abstract val mark: Array<Vector2>
     var conn: Connector? = null
 
@@ -30,5 +31,15 @@ abstract class BaseSocket(val ctx: Context, val ball: Ball) {
         ctx.sd.setColor(alphaColor(ctx.light[color], alpha))
         if (conn != null)
             ctx.sd.filledCircle(v.set(coord).scl(k).add(center), ctx.wc.radius * 0.15f * k)
+    }
+
+    fun serialize(sb: StringBuilder) {
+        sb.append(number).append(color)
+    }
+
+    fun deserialize(s: String, i: Int): Int {
+        number = s[i].digitToInt()
+        color = s[i + 1].digitToInt()
+        return i + 2
     }
 }
