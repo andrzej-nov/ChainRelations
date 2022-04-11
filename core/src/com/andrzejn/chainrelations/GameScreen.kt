@@ -26,7 +26,14 @@ class GameScreen(val ctx: Context) : KtxScreen {
     val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
     val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
 
-    init { // ballsCount n range 20..50
+    /**
+     * The input adapter instance for this screen
+     */
+    private val ia = IAdapter()
+
+    private var timeStart: Long = 0
+
+    init {
         ctx.setTheme()
         ctx.wc = WorldConstants(ctx.gs.ballsCount).also {
             it.setValues(
@@ -36,30 +43,25 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
     }
 
-    var world = World(ctx) // Create World after WorldConstants
+    var world = World(ctx) // Create World only after WorldConstants
 
     fun newGame(loadSavedGame: Boolean) {
-        maxConnLen = ctx.gs.maxRadius
         ctx.score.reset()
         updateInGameDuration()
         timeStart = Calendar.getInstance().timeInMillis
         world = World(ctx)
+        maxConnLen = ctx.gs.maxRadius
         if (loadSavedGame)
             try {
-                world.deserialize(ctx.sav.savedGame())
+                val s = ctx.sav.savedGame()
+                ctx.sav.loadSettingsAndScore(s)
+                world.deserialize(s)
             } catch (ex: Exception) {
                 // Something wrong. Just recreate new World and start new game
                 world = World(ctx)
             }
         resize(ctx.wc.width.toInt(), ctx.wc.height.toInt())
     }
-
-     /**
-     * The input adapter instance for this screen
-     */
-    private val ia = IAdapter()
-
-    private var timeStart: Long = 0
 
     override fun show() {
         super.show()
@@ -81,6 +83,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
         home.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
     }
 
+    /**
+     * Invoked when the screen is about to switch away, for any reason.
+     * Update the in-game time and save records.
+     */
     override fun hide() {
         super.hide()
         input.inputProcessor = null
@@ -90,7 +96,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
 
     /**
      * Invoked when the screen is about to close, for any reason.
-     * Update the in-game time.
+     * Update the in-game time and save records.
      */
     override fun pause() {
         updateInGameDuration()
@@ -101,12 +107,6 @@ class GameScreen(val ctx: Context) : KtxScreen {
     private fun updateInGameDuration() {
         ctx.gs.inGameDuration += Calendar.getInstance().timeInMillis - timeStart
         timeStart = Calendar.getInstance().timeInMillis
-    }
-
-    fun ballBlinked() {
-        suitableTargets = calcSuitableTargets(pointedBall, dragFrom)
-        if (suitableTargets?.isEmpty() == true)
-            cleanDragState(false)
     }
 
     var inShowAMove = false
@@ -121,15 +121,26 @@ class GameScreen(val ctx: Context) : KtxScreen {
         lastGameSave = t
     }
 
+    fun ballBlinked() {
+        suitableTargets = calcSuitableTargets(pointedBall, dragFrom)
+        if (suitableTargets?.isEmpty() == true)
+            cleanDragState(false)
+    }
+
     override fun render(delta: Float) {
         super.render(delta)
-        world.moveBalls(delta)
-        autoSaveGame()
-        if (!inShowAMove)
-            world.blinkRandomBall { ballBlinked() }
-        ctx.tweenManager.update(delta)
-        world.balls.filter { it.inBlink || it.inDeath }.forEach { it.setEyeCoords() }
-        ctx.batch.begin()
+        try {
+            world.moveBalls(delta)
+            autoSaveGame()
+            if (!inShowAMove)
+                world.blinkRandomBall { ballBlinked() }
+            ctx.tweenManager.update(delta)
+            world.balls.filter { it.inBlink || it.inDeath }.forEach { it.updateEyeCoords() }
+        } catch (ex: Exception) {
+            // There should be no exceptions here. But if they are, simply restart the game.
+            newGame(false)
+        }
+        if (!ctx.batch.isDrawing) ctx.batch.begin()
         ctx.sd.setColor(Color(Color.DARK_GRAY).also { it.a = 0.8f })
         ctx.sd.filledRectangle(0f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
         ctx.sd.filledRectangle(ctx.wc.width - ctx.wc.buttonSize - 5f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
@@ -141,7 +152,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         )
         val dF = dragFrom
         val pB = pointedBall
-        if (dF != null) // Drag from connector in progress. Draw background drag limit circle.
+        if (dF != null) // Drag from connector in progress. Draw background drag limits circle.
             ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
         world.drawConnectors()
         world.balls.filter { dF != null || it != pB }.forEach {
@@ -149,17 +160,17 @@ class GameScreen(val ctx: Context) : KtxScreen {
             ball.color =
                 if (dF != null && suitableTargets?.contains(it) == true) ctx.dark[dF.color] else Color.GRAY
             ball.draw(ctx.batch, it.alpha)
-            it.drawElements()
+            it.drawDetails()
         }
         ball.color = Color.GRAY
-        if (pB != null && dF == null) { // Draw large pointed ball to pick a connector and start drag
+        if (pB != null && dF == null) { // Draw pointed ball large to pick a connector and start drag
             setBallSpriteBounds(pointedBallCenter, 2f)
             ball.draw(ctx.batch, pB.alpha)
-            pB.drawElements(2f, pointedBallCenter)
+            pB.drawDetails(2f, pointedBallCenter)
         }
-        if (dF != null && dragTo.x > 0)
+        if (dF != null && dragTo.x > 0) // Draw drag line to current pointed coords
             ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
-        else if (dF != null && inShowAMove) {
+        else if (dF != null && inShowAMove) { // We are showing a move. Draw the line to the hand sprite
             val dFC = dF.absDrawCoord()
             ctx.sd.line(
                 dFC.x,
@@ -178,7 +189,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         ctx.score.draw(ctx.batch)
         if (inShowAMove)
             hand.draw(ctx.batch)
-        ctx.batch.end()
+        if (ctx.batch.isDrawing) ctx.batch.end()
     }
 
     private fun setBallSpriteBounds(v: Vector2, k: Float) {
@@ -243,22 +254,22 @@ class GameScreen(val ctx: Context) : KtxScreen {
     }
 
     fun showAMoveFinalize() {
-        if (dTforShow == null) {
+        val dT = dTforShow
+        if (dT == null) {
             cleanDragState(true)
             inShowAMove = false
             return
         }
-        val dTCoordForShow = dTforShow!!.coord
         Timeline.createSequence()
             .push(
                 Tween.to(hand, TW_POS_XY, 1f)
-                    .target(dTCoordForShow.x - hand.width / 2, dTCoordForShow.y - hand.height)
+                    .target(dT.coord.x - hand.width / 2, dT.coord.y - hand.height)
             )
             .pushPause(0.2f)
             .push(Tween.call { _, _ ->
                 val dF = dragFrom
                 if (dF != null)
-                    world.addConnector(dF, dTforShow ?: return@call)
+                    world.addConnector(dF, dT)
                 cleanDragState(true)
                 inShowAMove = false
             })
@@ -328,7 +339,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
 
         /**
-         * Called when screen is untouched (mouse button released). That's either a drag end or tile drop.
+         * Called when screen is untouched (mouse button released)
          */
         override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
             if (inShowAMove) return super.touchUp(screenX, screenY, pointer, button)
@@ -342,15 +353,15 @@ class GameScreen(val ctx: Context) : KtxScreen {
             }
             cleanDragState(true)
             when {
-                buttonPressed(v, play) -> newGame(false)
-                buttonPressed(v, exit) -> Gdx.app.exit()
-                buttonPressed(v, hit) -> world.randomHit()
-                buttonPressed(v, help) -> showAMove()
+                buttonTouched(v, play) -> newGame(false)
+                buttonTouched(v, exit) -> Gdx.app.exit()
+                buttonTouched(v, hit) -> world.randomHit()
+                buttonTouched(v, help) -> showAMove()
             }
             return super.touchUp(screenX, screenY, pointer, button)
         }
 
-        private fun buttonPressed(v: Vector2, s: Sprite) = v.x in s.x..s.x + s.width && v.y in s.y..s.y + s.height
+        private fun buttonTouched(v: Vector2, s: Sprite) = v.x in s.x..s.x + s.width && v.y in s.y..s.y + s.height
 
         private fun setDragFrom(v: Vector2) {
             val pB = pointedBall ?: return

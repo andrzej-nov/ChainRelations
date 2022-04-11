@@ -16,9 +16,10 @@ class Ball(val ctx: Context, var number: Int) {
     val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this, cnt++) }
     val sockets: List<BaseSocket> = inSock.toList<BaseSocket>().plus(outSock)
 
-    val maxColor: Int = ctx.gs.colorsCount // In range 6..7. 5 is too easy
+    val maxColor: Int = ctx.gs.colorsCount
 
-    // force[0] is border barrier force, then go connectors attraction, then repulsions from other balls
+    // force[0] is the border barrier force + accelerometers, then go up to 6 connectors attraction forces,
+    // then repulsions from other balls
     var force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
     val coord: Vector2 = Vector2()
 
@@ -84,8 +85,8 @@ class Ball(val ctx: Context, var number: Int) {
 
     var prevAngle = 1f
 
-    fun setElementCoords(forceUpdate: Boolean = false) {
-        if (!forceUpdate && abs(angle - prevAngle) < 0.01)
+    fun setElementCoords(acceptAnyAngleChangeAmount: Boolean = false) {
+        if (!acceptAnyAngleChangeAmount && abs(angle - prevAngle) < 0.01)
             return
         prevAngle = angle
         var a = angle + PI.toFloat() / 6
@@ -99,27 +100,27 @@ class Ball(val ctx: Context, var number: Int) {
             it.setup(r, markSide, a)
             a += PI.toFloat() / 3f
         }
-        setEyeCoords()
+        updateEyeCoords()
     }
 
-    fun drawElements(k: Float = 1f, center: Vector2 = drawCoord) {
+    fun drawDetails(k: Float = 1f, center: Vector2 = drawCoord) {
         sockets.forEach { it.draw(k, center, alpha) }
         drawEyes(k, center)
     }
 
     var eyeL = Vector2() to Vector2()
     var eyeR = Vector2() to Vector2()
-    var eyeHk: Float = 1f
+    var eyeK: Float = 1f
     var inBlink = false
     var inDeath = false
     var alpha: Float = 1f
 
-    fun setEyeCoords() {
+    fun updateEyeCoords() {
         val len = ctx.wc.radius * 0.1f
-        eyeL.first.set(-2 * len, -2 * len * eyeHk).rotateRad(angle)
-        eyeL.second.set(-2 * len, 3 * len * eyeHk).rotateRad(angle)
-        eyeR.first.set(2 * len, -2 * len * eyeHk).rotateRad(angle)
-        eyeR.second.set(2 * len, 3 * len * eyeHk).rotateRad(angle)
+        eyeL.first.set(-2 * len, -2 * len * eyeK).rotateRad(angle)
+        eyeL.second.set(-2 * len, 3 * len * eyeK).rotateRad(angle)
+        eyeR.first.set(2 * len, -2 * len * eyeK).rotateRad(angle)
+        eyeR.second.set(2 * len, 3 * len * eyeK).rotateRad(angle)
     }
 
     private val eye = Vector2() to Vector2()
@@ -127,22 +128,23 @@ class Ball(val ctx: Context, var number: Int) {
     val c = Color()
     fun alphaColor(color: Color): Color = c.set(color).also { it.a = alpha }
 
-    fun drawEyes(k: Float, center: Vector2) {
-        ctx.sd.setColor(alphaColor(Color.GRAY))
+    private fun drawEye(e: Pair<Vector2, Vector2>, k: Float, center: Vector2) {
         ctx.sd.line(
             eye.first.set(eyeL.first).scl(k).add(center),
             eye.second.set(eyeL.second).scl(k).add(center),
             ctx.wc.lineWidth * 3 * k
         )
-        ctx.sd.line(
-            eye.first.set(eyeR.first).scl(k).add(center),
-            eye.second.set(eyeR.second).scl(k).add(center),
-            ctx.wc.lineWidth * 3 * k
-        )
+    }
+
+    fun drawEyes(k: Float, center: Vector2) {
+        ctx.sd.setColor(alphaColor(Color.GRAY))
+        drawEye(eyeL)
+        drawEye(eyeR)
     }
 
     fun serialize(sb: StringBuilder) {
-        sb.append(number, 2).append(coord.x.toInt(), 4).append(coord.y.toInt(), 4).append((angle * 1000).toInt(), 4)
+        sb.append(number, 2).append(coord.x.toInt(), 4).append(coord.y.toInt(), 4)
+            .append((angle * 1000).toInt(), 4)
         sockets.forEach { it.serialize(sb) }
     }
 

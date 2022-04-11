@@ -16,7 +16,7 @@ class BallAccessor : TweenAccessor<Ball> {
      */
     override fun getValues(target: Ball?, tweenType: Int, returnValues: FloatArray?): Int {
         when (tweenType) {
-            TW_EYE_HK -> returnValues!![0] = target!!.eyeHk
+            TW_EYE_HK -> returnValues!![0] = target!!.eyeK
             TW_ALPHA -> returnValues!![0] = target!!.alpha
         }
         return 1
@@ -28,7 +28,7 @@ class BallAccessor : TweenAccessor<Ball> {
      */
     override fun setValues(target: Ball?, tweenType: Int, newValues: FloatArray?) {
         when (tweenType) {
-            TW_EYE_HK -> (target ?: return).eyeHk = (newValues ?: return)[0]
+            TW_EYE_HK -> (target ?: return).eyeK = (newValues ?: return)[0]
             TW_ALPHA -> (target ?: return).alpha = (newValues ?: return)[0]
         }
     }

@@ -237,7 +237,6 @@ class Context(
         theme = if (gs.isDarkTheme) dk else lt
     }
 
-
     /**
      * Cleanup
      */

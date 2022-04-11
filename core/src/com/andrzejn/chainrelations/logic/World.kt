@@ -36,9 +36,7 @@ class World(val ctx: Context) {
             it.coord.sub(buttonSize, 0f).scl(kx, ky).add(buttonSize, 0f)
             it.setElementCoords(true)
         }
-        connectors.forEach {
-            it.attraction = ctx.wc.attraction
-        }
+        connectors.forEach { it.attraction = ctx.wc.attraction }
     }
 
     tailrec fun calcRepulsions(ball: List<Ball>) {
@@ -146,11 +144,11 @@ class World(val ctx: Context) {
             .push(Tween.call { _, _ -> b.inBlink = true })
             .push(Tween.to(b, TW_EYE_HK, 0.3f).target(0f))
             .push(Tween.to(b, TW_EYE_HK, 0.2f).target(1f))
-            .push(Tween.call { _, _ ->
+            .setCallback { _, _ ->
                 b.inBlink = false
                 b.recolorRandomSocket()
                 ballBlinked()
-            })
+            }
             .start(ctx.tweenManager)
     }
 
@@ -162,7 +160,7 @@ class World(val ctx: Context) {
         connectors.forEach { it.serialize(sb) }
     }
 
-    fun deserialize(s: String): Boolean {
+    fun deserialize(s: String) {
         val width = s.substring(16..19).toFloat()
         val height = s.substring(20..23).toFloat()
         ctx.wc.ballsCount = s.substring(24..25).toInt()
@@ -170,9 +168,7 @@ class World(val ctx: Context) {
         balls = List(ctx.wc.ballsCount) { Ball(ctx, 0) }
         var i = 26
         val bi = balls.iterator()
-        repeat(ctx.wc.ballsCount) {
-            i = bi.next().deserialize(s, i)
-        }
+        repeat(ctx.wc.ballsCount) { i = bi.next().deserialize(s, i) }
         connectors.clear()
         val connCount = s.substring(i..i + 2).toInt()
         i += 3
@@ -191,6 +187,5 @@ class World(val ctx: Context) {
             connectors.add(conn)
             i += 9
         }
-        return true
     }
 }
