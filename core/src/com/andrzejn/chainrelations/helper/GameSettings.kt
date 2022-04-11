@@ -40,7 +40,7 @@ class GameSettings {
     }
 
     /**
-     * Board size. Board is square, allowed values are 6, 8, 10
+     * Maximum connector radius, 3..6
      */
     var maxRadius: Float
         get() = iMaxRadius
@@ -51,7 +51,7 @@ class GameSettings {
         }
 
     /**
-     * Cell/tile sizes count. Allowed values are 4, 6, 8
+     * Balls count, 20..60
      */
     var ballsCount: Int
         get() = iBallsCount

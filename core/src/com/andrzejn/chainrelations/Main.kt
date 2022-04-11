@@ -19,25 +19,32 @@ class Main : KtxGame<KtxScreen>() {
      * On mobile devices, it is called each time when the application is restored/relaunched from background.
      */
     override fun create() {
-        graphics.isContinuousRendering = true // This game does not require continuous screen rendering as it is
-        // mostly static. So let's switch to rendering on demand, to save CPU resources.
+        //graphics.isContinuousRendering = true
         ctx.gs.reset()
         ctx.setTheme()
         ctx.reloadAtlas()
         ctx.initBatch() // OpegGL batch objects are heavy. Usually you just need to create one or few of them
         // on the app start and retain them until the end
-        val gs = GameScreen(ctx)
-        addScreen(gs)
-        setScreen<GameScreen>()
-        gs.newGame(true)
-        graphics.requestRendering() // Request first screen redraw.
+        addScreen(GameScreen(ctx))
+        addScreen(CreditsScreen(ctx))
+        addScreen(HomeScreen(ctx))
+        newOrSavedGame()
+    }
+
+    private fun newOrSavedGame() {
+        val s = ctx.sav.savedGame()
+        if (s.length > 26) {
+            getScreen<GameScreen>().newGame(true)
+            setScreen<GameScreen>()
+        } else
+            setScreen<HomeScreen>()
     }
 
     override fun resume() {
         super.resume()
         ctx.reloadAtlas()
         ctx.initBatch()
-        getScreen<GameScreen>().newGame(true)
+        newOrSavedGame()
     }
 
     /**

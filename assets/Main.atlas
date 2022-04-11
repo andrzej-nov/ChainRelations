@@ -9,6 +9,11 @@ hand
   xy: 0, 0
   size: 134, 150
   index: -1
+gear
+  rotate: false
+  xy: 139, 0
+  size: 150, 150
+  index: -1
 black
   rotate: false
   xy: 20, 230
@@ -169,8 +174,38 @@ lighttheme
   xy: 570, 815
   size: 150, 150
   index: -1
- logo
+logo
    rotate: false
    xy: 0, 970
    size: 567,168
+   index: -1
+largeballs
+   rotate: false
+   xy: 0, 730
+   size: 120,120
+   index: -1
+smallballs
+  rotate: false
+  xy: 120, 730
+  size: 120,120
+  index: -1
+smallradius
+   rotate: false
+   xy: 0, 850
+   size: 120,120
+   index: -1
+largeradius
+   rotate: false
+   xy: 120, 850
+   size: 120,120
+   index: -1
+colors6
+   rotate: false
+   xy: 240, 730
+   size: 120,120
+   index: -1
+colors7
+   rotate: false
+   xy: 260, 850
+   size: 120,120
    index: -1

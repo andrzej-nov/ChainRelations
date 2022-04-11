@@ -15,6 +15,7 @@ class World(val ctx: Context) {
     val connectors = mutableListOf<Connector>()
 
     init {
+        println("World created at ${ctx.gs.ballsCount} and ${ctx.gs.maxRadius}")
         val width = ctx.wc.width - 2 * ctx.wc.radius - 2 * ctx.wc.buttonSize
         val offsetX = ctx.wc.radius + ctx.wc.buttonSize
         val height = ctx.wc.height - 2 * ctx.wc.radius
@@ -163,8 +164,7 @@ class World(val ctx: Context) {
     fun deserialize(s: String) {
         val width = s.substring(16..19).toFloat()
         val height = s.substring(20..23).toFloat()
-        ctx.wc.ballsCount = s.substring(24..25).toInt()
-        ctx.wc.setValues(width, height)
+        ctx.wc.setValues(width, height, s.substring(24..25).toInt())
         balls = List(ctx.wc.ballsCount) { Ball(ctx, 0) }
         var i = 26
         val bi = balls.iterator()

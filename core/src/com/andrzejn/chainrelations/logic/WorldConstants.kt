@@ -21,7 +21,7 @@ class WorldConstants(var ballsCount: Int) {
     var height: Float = 1f
     var buttonSize: Float = 0f
 
-    fun setValues(w: Float, h: Float) {
+    fun setValues(w: Float, h: Float, bCount: Int = ballsCount) {
         width = w
         height = h
         fontHeight = (h / 30).toInt()

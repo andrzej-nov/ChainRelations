@@ -86,14 +86,16 @@ class Context(
         s.setSize(width, height)
     }
 
+    private val v3 = Vector3()
+
     /**
      * Convert the UI screen coordinates (mouse clicks or touches, for example) to the OpenGL scene coordinates
      * which are used for drawing
      */
     fun pointerPosition(screenX: Int, screenY: Int): Vector2 {
-        val v = Vector3(screenX.toFloat(), screenY.toFloat(), 0f)
-        camera.unproject(v)
-        return Vector2(v.x, v.y)
+        v3.set(screenX.toFloat(), screenY.toFloat(), 0f)
+        camera.unproject(v3)
+        return Vector2(v3.x, v3.y)
     }
 
     /**
@@ -137,9 +139,22 @@ class Context(
     val home: TextureRegion get() = texture("home")
     val play: TextureRegion get() = texture("play")
     val exit: TextureRegion get() = texture("poweroff")
+    val options: TextureRegion get() = texture("options")
     val help: TextureRegion get() = texture("help")
     val hit: TextureRegion get() = texture("cancel")
     val hand: TextureRegion get() = texture("hand")
+    val gear: TextureRegion get() = texture("gear")
+    val icongmail: TextureRegion get() = texture("icongmail")
+    val icontelegram: TextureRegion get() = texture("icontelegram")
+    val icongithub: TextureRegion get() = texture("icongithub")
+    val darktheme: TextureRegion get() = texture("darktheme")
+    val lighttheme: TextureRegion get() = texture("lighttheme")
+    val largeballs: TextureRegion get() = texture("largeballs")
+    val smallballs: TextureRegion get() = texture("smallballs")
+    val smallradius: TextureRegion get() = texture("smallradius")
+    val largeradius: TextureRegion get() = texture("largeradius")
+    val colors6: TextureRegion get() = texture("colors6")
+    val colors7: TextureRegion get() = texture("colors7")
 
     /**
      * Create a bitmap font with given size, base color etc. from the provided TrueType font.

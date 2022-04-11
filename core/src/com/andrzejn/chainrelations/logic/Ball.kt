@@ -130,16 +130,16 @@ class Ball(val ctx: Context, var number: Int) {
 
     private fun drawEye(e: Pair<Vector2, Vector2>, k: Float, center: Vector2) {
         ctx.sd.line(
-            eye.first.set(eyeL.first).scl(k).add(center),
-            eye.second.set(eyeL.second).scl(k).add(center),
+            eye.first.set(e.first).scl(k).add(center),
+            eye.second.set(e.second).scl(k).add(center),
             ctx.wc.lineWidth * 3 * k
         )
     }
 
     fun drawEyes(k: Float, center: Vector2) {
         ctx.sd.setColor(alphaColor(Color.GRAY))
-        drawEye(eyeL)
-        drawEye(eyeR)
+        drawEye(eyeL, k, center)
+        drawEye(eyeR, k, center)
     }
 
     fun serialize(sb: StringBuilder) {

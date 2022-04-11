@@ -49,6 +49,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         ctx.score.reset()
         updateInGameDuration()
         timeStart = Calendar.getInstance().timeInMillis
+        ctx.wc.ballsCount = ctx.gs.ballsCount
         world = World(ctx)
         maxConnLen = ctx.gs.maxRadius
         if (loadSavedGame)
@@ -67,6 +68,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
         super.show()
         input.inputProcessor = ia
         timeStart = Calendar.getInstance().timeInMillis
+        Gdx.graphics.isContinuousRendering = true
     }
 
     override fun resize(width: Int, height: Int) {
@@ -357,6 +359,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
                 buttonTouched(v, exit) -> Gdx.app.exit()
                 buttonTouched(v, hit) -> world.randomHit()
                 buttonTouched(v, help) -> showAMove()
+                buttonTouched(v, home) -> ctx.game.setScreen<HomeScreen>()
             }
             return super.touchUp(screenX, screenY, pointer, button)
         }
