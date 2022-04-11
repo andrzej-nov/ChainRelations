@@ -10,48 +10,112 @@ import kotlin.math.abs
 import kotlin.math.floor
 import kotlin.random.Random
 
-class Ball(val ctx: Context, var number: Int) {
+/**
+ * The game ball object. Moves and rotates according to the simplified physics rules, has color sockets
+ * and blinking eyes.
+ */
+class Ball(
+    /**
+     * Reference to the main app context
+     */
+    val ctx: Context,
+    /**
+     * An unique number of this ball, for serialization/deserialization purposes
+     */
+    var number: Int
+) {
     private var cnt = 1
+
+    /**
+     * Inbound sockets
+     */
     val inSock: Array<InSocket> = Array(3) { InSocket(ctx, this, cnt++) }
+
+    /**
+     * Outbound sockets
+     */
     val outSock: Array<OutSocket> = Array(3) { OutSocket(ctx, this, cnt++) }
+
+    /**
+     * All sockets, inbound+outbound, to simplify iterations
+     */
     val sockets: List<BaseSocket> = inSock.toList<BaseSocket>().plus(outSock)
 
-    val maxColor: Int = ctx.gs.colorsCount
+    /**
+     * Maximum colors count (a copy of the game settings value, for slightly faster and cleaner access)
+     */
+    private val maxColor: Int = ctx.gs.colorsCount
 
-    // force[0] is the border barrier force + accelerometers, then go up to 6 connectors attraction forces,
-    // then repulsions from other balls
-    var force = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
+    /**
+     * All the linear forces affecting this ball.
+     * force[0] is the border barrier force + accelerometers, then go up to 6 connectors attraction forces,
+     * then repulsions from other balls
+     */
+    var force: Array<Vector2> = Array(ctx.wc.ballsCount + 7) { Vector2(0f, 0f) }
+
+    /**
+     * Current ball center coordinates
+     */
     val coord: Vector2 = Vector2()
 
-    var torque = 0f
-    var angle: Float = 0f
+    /**
+     * Angular force momentum
+     */
+    var torque: Float = 0f
 
-    var i = 0 // Array counter for the forces calculation
+    /**
+     * Current ball rotation. Clipped to 0..2*PI
+     */
+    private var angle: Float = 0f
+
+    /**
+     * Internal force array counter for the forces calculation
+     */
+    private var i: Int = 0
 
     init {
         reset()
     }
 
+    /**
+     * Reset the ball angle and sockets (make it a new ball on the same position, used when the ball dies and
+     * new one is born instead)
+     */
     fun reset() {
         angle = 0f
         val color = (1..maxColor).plus((1..maxColor)).shuffled().iterator()
         sockets.forEach { it.color = color.next() }
     }
 
+    /**
+     * Change a random unconnected socket color. Invoked on ball blinking.
+     */
     fun recolorRandomSocket() {
         sockets.filter { it.conn == null }.random().color = Random.nextInt(maxColor) + 1
     }
 
-    fun addForce(f: Vector2) = force[i++].set(f)
+    /**
+     * Set one more force to the forces array
+     */
+    fun addForce(f: Vector2): Vector2 = force[i++].set(f)
 
+    /**
+     * Clear all the forces before new calculation
+     */
     fun clearForces() {
         force.forEach { it.set(0f, 0f) }
         torque = 0f
         i = 1
     }
 
+    /**
+     * Internal variable to reduce GC load on creating a lot of transient objects
+     */
     private val f = Vector2()
 
+    /**
+     * Calculate and set all repulsion forces from other balls
+     */
     fun calcRepulsions(balls: List<Ball>) {
         balls.forEach { that ->
             f.set(this.coord).sub(that.coord).setLength(ctx.wc.repulsion(this.coord.dst2(that.coord)))
@@ -60,12 +124,20 @@ class Ball(val ctx: Context, var number: Int) {
         }
     }
 
-    fun applyAccelerometers() =
+    /**
+     * Apply slight accelerometer force, to let the balls respons to the real world gravitation
+     */
+    fun applyAccelerometers(): Vector2 =
         force[0].add(Gdx.input.accelerometerY * ctx.wc.radius / 5, -Gdx.input.accelerometerX * ctx.wc.radius / 5)
 
-    val drawCoord = Vector2(-1f, -1f)
+    /**
+     * Visual ball center coordinates. May differ from the actual coord by 1 pixel, to avoid balls' minor visual
+     * trembling.
+     */
+    val drawCoord: Vector2 = Vector2(-1f, -1f)
 
     /**
+     * Move/rotate the ball according to the applied forced.
      * Simplified physics: movement is proportional to the force (consider it a movement in a viscous medium)
      */
     fun moveBy(delta: Float, calcSteps: Int) {
@@ -83,15 +155,23 @@ class Ball(val ctx: Context, var number: Int) {
         }
     }
 
-    var prevAngle = 1f
+    /**
+     * Visual ball rotation angle. May differ from the actual angle by 0.01 radians, to avoid balls' minor visual
+     * trembling.
+     */
+    private var prevAngle: Float = 1f
 
+    /**
+     * Recalculate sockets and eyes positions. Usually skips when there is no significant angle changes,
+     * but there is the override parameter to always recalculate, when the eyes size is tweened.
+     */
     fun setElementCoords(acceptAnyAngleChangeAmount: Boolean = false) {
         if (!acceptAnyAngleChangeAmount && abs(angle - prevAngle) < 0.01)
             return
         prevAngle = angle
         var a = angle + PI.toFloat() / 6
         val r = ctx.wc.radius * 0.8f
-        var markSide = ctx.wc.radius * 0.1f
+        val markSide = ctx.wc.radius * 0.1f
         outSock.forEach {
             it.setup(r, markSide, a)
             a += PI.toFloat() / 3f
@@ -103,18 +183,40 @@ class Ball(val ctx: Context, var number: Int) {
         updateEyeCoords()
     }
 
+    /**
+     * Render sockets and eyes
+     */
     fun drawDetails(k: Float = 1f, center: Vector2 = drawCoord) {
         sockets.forEach { it.draw(k, center, alpha) }
         drawEyes(k, center)
     }
 
-    var eyeL = Vector2() to Vector2()
-    var eyeR = Vector2() to Vector2()
+    private var eyeL: Pair<Vector2, Vector2> = Vector2() to Vector2()
+    private var eyeR: Pair<Vector2, Vector2> = Vector2() to Vector2()
+
+    /**
+     * The eyes height coefficient, for tweening.
+     */
     var eyeK: Float = 1f
-    var inBlink = false
-    var inDeath = false
+
+    /**
+     * Is the ball in the blinking animation
+     */
+    var inBlink: Boolean = false
+
+    /**
+     * Is the ball in the death animation
+     */
+    var inDeath: Boolean = false
+
+    /**
+     * The ball alpha channel
+     */
     var alpha: Float = 1f
 
+    /**
+     * Recalculate eyes angle/size
+     */
     fun updateEyeCoords() {
         val len = ctx.wc.radius * 0.1f
         eyeL.first.set(-2 * len, -2 * len * eyeK).rotateRad(angle)
@@ -123,11 +225,20 @@ class Ball(val ctx: Context, var number: Int) {
         eyeR.second.set(2 * len, 3 * len * eyeK).rotateRad(angle)
     }
 
+    /**
+     * Internal calculations variables to reduce the GC load
+     */
     private val eye = Vector2() to Vector2()
+    private val c: Color = Color()
 
-    val c = Color()
-    fun alphaColor(color: Color): Color = c.set(color).also { it.a = alpha }
+    /**
+     * Apply alpha channel to the given color
+     */
+    private fun alphaColor(color: Color): Color = c.set(color).also { it.a = alpha }
 
+    /**
+     * Draw single eye
+     */
     private fun drawEye(e: Pair<Vector2, Vector2>, k: Float, center: Vector2) {
         ctx.sd.line(
             eye.first.set(e.first).scl(k).add(center),
@@ -136,18 +247,27 @@ class Ball(val ctx: Context, var number: Int) {
         )
     }
 
-    fun drawEyes(k: Float, center: Vector2) {
+    /**
+     * Draw eyes
+     */
+    private fun drawEyes(k: Float, center: Vector2) {
         ctx.sd.setColor(alphaColor(ctx.theme.eyeColor))
         drawEye(eyeL, k, center)
         drawEye(eyeR, k, center)
     }
 
+    /**
+     * Serialize the ball for save game
+     */
     fun serialize(sb: StringBuilder) {
         sb.append(number, 2).append(coord.x.toInt(), 4).append(coord.y.toInt(), 4)
             .append((angle * 1000).toInt(), 4)
         sockets.forEach { it.serialize(sb) }
     }
 
+    /**
+     * Deserialize the ball for load game
+     */
     fun deserialize(s: String, i: Int): Int {
         number = s.substring(i..i + 1).toInt()
         coord.x = s.substring(i + 2..i + 5).toFloat()

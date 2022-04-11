@@ -15,8 +15,14 @@ class Score(
      */
     val ctx: Context
 ) {
-    // Score counters
+    /**
+     * Number of moves
+     */
     var moves: Int = 0
+
+    /**
+     * Number of points for killed balls
+     */
     var points: Int = 0
 
     private var recordMoves: Int = 0
@@ -171,7 +177,7 @@ class Score(
     }
 
     /**
-     * Update current records to the settings stotage, as needed
+     * Update current records to the settings storage, as needed
      */
     fun saveRecords() {
         if (moves > recordMoves) {

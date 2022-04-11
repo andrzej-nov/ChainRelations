@@ -267,6 +267,7 @@ class Context(
     fun dispose() {
         if (this::batch.isInitialized)
             batch.dispose()
+        score.dispose()
     }
 
 }

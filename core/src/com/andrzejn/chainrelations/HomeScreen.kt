@@ -62,6 +62,7 @@ class HomeScreen(val ctx: Context) : KtxScreen {
     private val lineWidth = 2f
     private var radius = 0f
     private var baseX = 0f
+    private var baseWidth = 0f
 
     /**
      * Called by the GDX framework on screen resize (window resize, device rotation). Triggers all subsequent
@@ -71,7 +72,7 @@ class HomeScreen(val ctx: Context) : KtxScreen {
         super.resize(width, height)
         ctx.setCamera(width, height)
         val baseHeight = ctx.camera.viewportHeight
-        val baseWidth = min(ctx.camera.viewportWidth, baseHeight * 3 / 4)
+        baseWidth = min(ctx.camera.viewportWidth, baseHeight * 3 / 4)
         baseX = (ctx.camera.viewportWidth - baseWidth) / 2
         gridX = baseWidth / 12
         gridY = baseHeight / 8
@@ -162,6 +163,7 @@ class HomeScreen(val ctx: Context) : KtxScreen {
         super.render(delta)
         ctx.batch.begin()
         ctx.sd.filledRectangle(0f, 0f, ctx.camera.viewportWidth, ctx.camera.viewportHeight, ctx.theme.screenBackground)
+        ctx.sd.rectangle(baseX, 0f, baseWidth, ctx.camera.viewportHeight, ctx.theme.settingSeparator)
         logo.draw(ctx.batch)
         renderGameSettings()
 
@@ -237,7 +239,15 @@ class HomeScreen(val ctx: Context) : KtxScreen {
             0f,
             ctx.theme.settingSelection, ctx.theme.settingSelection
         )
+    }
 
+    /**
+     * Clean up
+     */
+    override fun dispose() {
+        sBallsCount.dispose()
+        sMaxRadius.dispose()
+        super.dispose()
     }
 
     /**

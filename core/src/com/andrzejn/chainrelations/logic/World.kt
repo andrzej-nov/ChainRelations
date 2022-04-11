@@ -11,11 +11,10 @@ import kotlin.random.Random
 
 class World(val ctx: Context) {
     private var cnt = 1
-    var balls = List(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
-    val connectors = mutableListOf<Connector>()
+    var balls: List<Ball> = List(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
+    private val connectors = mutableListOf<Connector>()
 
     init {
-        println("World created at ${ctx.gs.ballsCount} and ${ctx.gs.maxRadius}")
         val width = ctx.wc.width - 2 * ctx.wc.radius - 2 * ctx.wc.buttonSize
         val offsetX = ctx.wc.radius + ctx.wc.buttonSize
         val height = ctx.wc.height - 2 * ctx.wc.radius
@@ -40,7 +39,7 @@ class World(val ctx: Context) {
         connectors.forEach { it.attraction = ctx.wc.attraction }
     }
 
-    tailrec fun calcRepulsions(ball: List<Ball>) {
+    private tailrec fun calcRepulsions(ball: List<Ball>) {
         if (ball.size <= 1)
             return
         val b = ball.drop(1)
@@ -81,7 +80,7 @@ class World(val ctx: Context) {
             val outSocket = otherBall.outSock.firstOrNull { it.conn == null && it.color == from.color } ?: return false
             Connector(from, outSocket, ctx.wc.attraction)
         } else {
-            val inSocket = otherBall.inSock.firstOrNull() { it.conn == null && it.color == from.color } ?: return false
+            val inSocket = otherBall.inSock.firstOrNull { it.conn == null && it.color == from.color } ?: return false
             Connector(inSocket, from as OutSocket, ctx.wc.attraction)
         }
         ctx.score.incrementMoves()
@@ -117,7 +116,7 @@ class World(val ctx: Context) {
         return true
     }
 
-    fun drawConnectors() = connectors.forEach {
+    fun drawConnectors(): Unit = connectors.forEach {
         ctx.sd.setColor(ctx.theme.dark[it.color])
         ctx.sd.line(
             it.inSocket.absDrawCoord(),
@@ -164,7 +163,7 @@ class World(val ctx: Context) {
     fun deserialize(s: String) {
         val width = s.substring(16..19).toFloat()
         val height = s.substring(20..23).toFloat()
-        ctx.wc.setValues(width, height, s.substring(24..25).toInt())
+        ctx.wc.setValues(width, height)
         balls = List(ctx.wc.ballsCount) { Ball(ctx, 0) }
         var i = 26
         val bi = balls.iterator()
@@ -179,8 +178,10 @@ class World(val ctx: Context) {
             val outBallNumber = s.substring(i + 5..i + 7).toInt()
             val outSockNumber = s[i + 8].digitToInt()
             val conn =
-                Connector(balls.first { it.number == inBallNumber }.sockets.first { it.number == inSockNumber } as InSocket,
-                    balls.first { it.number == outBallNumber }.sockets.first { it.number == outSockNumber } as OutSocket,
+                Connector(balls.first { it.number == inBallNumber }
+                    .sockets.first { it.number == inSockNumber } as InSocket,
+                    balls.first { it.number == outBallNumber }
+                        .sockets.first { it.number == outSockNumber } as OutSocket,
                     ctx.wc.attraction
                 )
             conn.color = c

@@ -62,7 +62,7 @@ class GameSettings {
         }
 
     /**
-     * Number of different colors used for tile segments. Allowed values are from (sidesCount / 2) to 6
+     * Number of different colors used for ball sockets. 6..7
      */
     var colorsCount: Int
         get() = iColorsCount
@@ -111,10 +111,13 @@ class GameSettings {
         return "$prefix$iBallsCount$iColorsCount${serializeFloat(iMaxRadius)}"
     }
 
+    /***
+     * Stable float serialization to the N.N format
+     */
     private fun serializeFloat(f: Float): String = String.format(Locale.ROOT, "%.1f", f)
 
     /**
-     * Record moves value for the current tile type - game size - colors
+     * Record moves value for the current balls count - max radius - colors
      */
     var recordMoves: Int
         get() = pref.getInteger(keyName(sRECORDMOVES), 0)
@@ -124,7 +127,7 @@ class GameSettings {
         }
 
     /**
-     * Record moves value for the current tile type - game size - colors
+     * Record moves value for the current balls count - max radius - colors
      */
     var recordPoints: Int
         get() = pref.getInteger(keyName(sRECORDPOINTS), 0)
@@ -134,7 +137,7 @@ class GameSettings {
         }
 
     /**
-     * Serialize game settings, to include into the saved game. Always 4 characters.
+     * Serialize game settings, to include into the saved game. Always 6 characters.
      */
     fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
         sb.append(serializeFloat(iMaxRadius)).append(ballsCount).append(colorsCount)

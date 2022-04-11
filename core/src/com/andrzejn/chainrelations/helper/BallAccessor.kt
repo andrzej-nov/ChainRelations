@@ -3,7 +3,14 @@ package com.andrzejn.chainrelations.helper
 import aurelienribon.tweenengine.TweenAccessor
 import com.andrzejn.chainrelations.logic.Ball
 
+/**
+ * Ball eye size changes
+ */
 const val TW_EYE_HK: Int = 3
+
+/**
+ * Ball alpha channel changes
+ */
 const val TW_ALPHA: Int = 4
 
 /**

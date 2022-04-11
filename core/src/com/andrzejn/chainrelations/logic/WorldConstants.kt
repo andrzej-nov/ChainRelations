@@ -5,23 +5,66 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-class WorldConstants(var ballsCount: Int) {
+/**
+ * Values that do not change during the game (except for the screen resize)
+ */
+class WorldConstants(
+    /**
+     * Total number of balls on the field
+     */
+    var ballsCount: Int
+) {
+    /**
+     * Font height for the score display
+     */
     var fontHeight: Int = 0
-    val distMult = 1.2f
+
+    /**
+     * Ball radius
+     */
     var radius: Float = 0f
-    var lineWidth = 0f
-    var barrierForce: Float = 0f
-    var baseRepulsion: Float = 0f
+
+    /**
+     * Base line width (for connectors, sockets etc.)
+     */
+    var lineWidth: Float = 0f
+
+    /**
+     * The strong repulsion force applied near the screen bprders and when one ball overlaps with another
+     */
+    private var barrierForce: Float = 0f
+
+    /**
+     * Maximum normal repulsion force at the minimal distance (then it is reduced by squared distance)
+     */
+    private var baseRepulsion: Float = 0f
+
+    /**
+     * Resulting ball force clipping, to avoid too fastball moves
+     */
     var forceLimit: Float = 0f
-    var radSquared: Float = 0f
-    var sideDist: Float = 0f
-    var borderDist: Float = 0f
+
+    /**
+     * The ball radius squared, for the force calculations
+     */
+    private var radSquared: Float = 0f
+
+    /**
+     * Multiplier coefficient for sideDist calculation
+     */
+    private val distMult: Float = 1.2f
+
+    /**
+     * Width of the left/right screen side panels with buttons
+     */
+    private var sideDist: Float = 0f
+    private var borderDist: Float = 0f
     var attraction: Float = 0f
     var width: Float = 1f
     var height: Float = 1f
     var buttonSize: Float = 0f
 
-    fun setValues(w: Float, h: Float, bCount: Int = ballsCount) {
+    fun setValues(w: Float, h: Float) {
         width = w
         height = h
         fontHeight = (h / 30).toInt()
@@ -49,7 +92,7 @@ class WorldConstants(var ballsCount: Int) {
             count++
         }
     }
-    
+
     fun repulsion(distSquared: Float): Float =
         if (distSquared <= borderDist) barrierForce else
             if (distSquared > 9 * radSquared) 0f else baseRepulsion / distSquared

@@ -4,9 +4,18 @@ import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.math.Vector2
 import space.earlygrey.shapedrawer.JoinType
 
+/**
+ * Incoming socket. Rendered as square, there is no orhr specific logic.
+ */
 class InSocket(ctx: Context, ball: Ball, number: Int) : BaseSocket(ctx, ball, number) {
-    override val mark = Array(4) { Vector2() }
+    /**
+     * Visual socket polygon coordinates for rendering (relative to the ball center)
+     */
+    override val mark: Array<Vector2> = Array(4) { Vector2() }
 
+    /**
+     * Assign the connector coordinates for the given size and rotation angle
+     */
     fun setup(r: Float, len: Float, a: Float) {
         super.setup(r)
         mark[0].set(coord).add(-len, -len)
@@ -16,8 +25,14 @@ class InSocket(ctx: Context, ball: Ball, number: Int) : BaseSocket(ctx, ball, nu
         mark.plus(coord).forEach { it.rotateRad(a) }
     }
 
+    /**
+     * Internal calculations variable to reduce the GC load
+     */
     private val f = FloatArray(8)
 
+    /**
+     * Render the socket. This implementation renders the unconnected socket case
+     */
     override fun draw(k: Float, center: Vector2, alpha: Float) {
         super.draw(k, center, alpha)
         if (conn != null)
