@@ -137,7 +137,7 @@ class Ball(val ctx: Context, var number: Int) {
     }
 
     fun drawEyes(k: Float, center: Vector2) {
-        ctx.sd.setColor(alphaColor(Color.GRAY))
+        ctx.sd.setColor(alphaColor(ctx.theme.eyeColor))
         drawEye(eyeL, k, center)
         drawEye(eyeR, k, center)
     }

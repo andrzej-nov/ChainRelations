@@ -118,7 +118,7 @@ class World(val ctx: Context) {
     }
 
     fun drawConnectors() = connectors.forEach {
-        ctx.sd.setColor(ctx.dark[it.color])
+        ctx.sd.setColor(ctx.theme.dark[it.color])
         ctx.sd.line(
             it.inSocket.absDrawCoord(),
             it.outSocket.absDrawCoord(),

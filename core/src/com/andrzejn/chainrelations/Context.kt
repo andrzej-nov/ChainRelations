@@ -214,7 +214,10 @@ class Context(
         val scorePoints: Color,
         val scoreMoves: Color,
         val light: Array<Color>,
-        val dark: Array<Color>
+        val dark: Array<Color>,
+        val eyeColor: Color,
+        val gameBorders: Color,
+        val ballColor: Color
     )
 
     private val lt: Theme = Theme(
@@ -227,7 +230,10 @@ class Context(
         scorePoints = Color(Color.CHARTREUSE).also { it.a = 0.7f },
         scoreMoves = Color(Color.GOLD).also { it.a = 0.7f },
         dark = this.light,
-        light = this.dark
+        light = this.dark,
+        eyeColor = Color.GRAY,
+        gameBorders = Color.GRAY,
+        ballColor = Color.WHITE
     )
 
     private val dk: Theme = Theme(
@@ -240,7 +246,10 @@ class Context(
         scorePoints = Color(Color.CHARTREUSE).also { it.a = 0.7f },
         scoreMoves = Color(Color.GOLD).also { it.a = 0.7f },
         dark = this.dark,
-        light = this.light
+        light = this.light,
+        eyeColor = Color.GRAY,
+        gameBorders = Color.DARK_GRAY,
+        ballColor = Color.GRAY
     )
 
     lateinit var theme: Theme

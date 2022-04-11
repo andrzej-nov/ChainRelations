@@ -75,8 +75,8 @@ class Slider(
     }
 
     fun render() {
-        ctx.sd.filledRectangle(x, y + height * 0.1f, width, height * 0.1f, Color.LIGHT_GRAY)
-        ctx.sd.filledRectangle(sliderX, y, 10f, height * 0.3f, Color.GRAY)
+        ctx.sd.filledRectangle(x, y + height * 0.1f, width, height * 0.1f, ctx.theme.settingItem)
+        ctx.sd.filledRectangle(sliderX, y, 10f, height * 0.3f, ctx.theme.settingSelection)
         fc.draw(ctx.sd.batch)
     }
 }

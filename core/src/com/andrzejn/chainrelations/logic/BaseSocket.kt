@@ -28,7 +28,7 @@ abstract class BaseSocket(val ctx: Context, val ball: Ball, var number: Int) {
     fun alphaColor(color: Color, alpha: Float): Color = c.set(color).also { it.a = alpha }
 
     open fun draw(k: Float, center: Vector2, alpha: Float) {
-        ctx.sd.setColor(alphaColor(ctx.light[color], alpha))
+        ctx.sd.setColor(alphaColor(ctx.theme.light[color], alpha))
         if (conn != null)
             ctx.sd.filledCircle(v.set(coord).scl(k).add(center), ctx.wc.radius * 0.15f * k)
     }

@@ -143,7 +143,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
             newGame(false)
         }
         if (!ctx.batch.isDrawing) ctx.batch.begin()
-        ctx.sd.setColor(Color(Color.DARK_GRAY).also { it.a = 0.8f })
+        ctx.sd.setColor(Color(ctx.theme.gameboardBackground))
+        ctx.sd.filledRectangle(0f, 0f, ctx.wc.width, ctx.wc.height)
+        ctx.sd.setColor(Color(ctx.theme.gameBorders).also { it.a = 0.8f })
         ctx.sd.filledRectangle(0f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
         ctx.sd.filledRectangle(ctx.wc.width - ctx.wc.buttonSize - 5f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
         ctx.sd.filledRectangle(
@@ -155,23 +157,23 @@ class GameScreen(val ctx: Context) : KtxScreen {
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limits circle.
-            ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, Color.DARK_GRAY)
+            ctx.sd.filledCircle(dF.absDrawCoord(), ctx.wc.radius * maxConnLen, ctx.theme.gameBorders)
         world.drawConnectors()
         world.balls.filter { dF != null || it != pB }.forEach {
             setBallSpriteBounds(it.drawCoord, 1f)
             ball.color =
-                if (dF != null && suitableTargets?.contains(it) == true) ctx.dark[dF.color] else Color.GRAY
+                if (dF != null && suitableTargets?.contains(it) == true) ctx.theme.dark[dF.color] else ctx.theme.ballColor
             ball.draw(ctx.batch, it.alpha)
             it.drawDetails()
         }
-        ball.color = Color.GRAY
+        ball.color = ctx.theme.ballColor
         if (pB != null && dF == null) { // Draw pointed ball large to pick a connector and start drag
             setBallSpriteBounds(pointedBallCenter, 2f)
             ball.draw(ctx.batch, pB.alpha)
             pB.drawDetails(2f, pointedBallCenter)
         }
         if (dF != null && dragTo.x > 0) // Draw drag line to current pointed coords
-            ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.light[dF.color], ctx.wc.lineWidth * 2)
+            ctx.sd.line(dF.absDrawCoord(), dragTo, ctx.theme.light[dF.color], ctx.wc.lineWidth * 2)
         else if (dF != null && inShowAMove) { // We are showing a move. Draw the line to the hand sprite
             val dFC = dF.absDrawCoord()
             ctx.sd.line(
@@ -179,7 +181,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
                 dFC.y,
                 hand.x + hand.width / 2,
                 hand.y + hand.height,
-                ctx.light[dF.color],
+                ctx.theme.light[dF.color],
                 ctx.wc.lineWidth * 2
             )
         }
