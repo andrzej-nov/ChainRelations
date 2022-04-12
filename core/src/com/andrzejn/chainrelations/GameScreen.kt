@@ -106,8 +106,8 @@ class GameScreen(
         play.setBounds(5f, fontHeight + 5 * buttonSize, buttonSize, buttonSize)
         help.setBounds(5f, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
         hit.setBounds(5f, fontHeight + buttonSize, buttonSize, buttonSize)
-        exit.setBounds(width - 5f - buttonSize, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
-        home.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
+        exit.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
+        home.setBounds(width - 5f - buttonSize, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
     }
 
     /**
