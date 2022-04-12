@@ -6,7 +6,7 @@ https://user-images.githubusercontent.com/89737218/162968270-6aa30746-8165-4126-
 
 ![Clipboard02!](https://user-images.githubusercontent.com/89737218/162968539-faea3fec-6ec0-41f7-a611-4dee8a661d09.jpg)
 
-**Game objective:** connect the balls' same-colored inputs to outputs. Completely conected balls disappear
+**Game objective:** connect the balls' same-colored inputs to outputs. Completely connected balls disappear
 and are replaced with new ones. The possible connection range is limited, so plan your moves.
 
 You can adjust balls count, connection range, and put additional color to the board.
