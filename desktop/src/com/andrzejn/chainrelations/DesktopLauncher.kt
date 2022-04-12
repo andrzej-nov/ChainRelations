@@ -12,7 +12,7 @@ object DesktopLauncher {
             setTitle("Chain Relations")
             setWindowedMode(960, 960)
             setForegroundFPS(60);
-            //setWindowIcon("icon256.png", "icon128.png", "icon64.png", "icon32.png", "icon16.png")
+            setWindowIcon("icon256.png", "icon128.png", "icon64.png", "icon32.png", "icon16.png")
         })
     }
 }

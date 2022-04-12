@@ -1,6 +1,6 @@
 sourceCompatibility = 8.0
 sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../assets"]
+sourceSets.main.resources.srcDirs = ["../assets", "resources"]
 
 project.ext.mainClassName = "com.andrzejn.chainrelations.DesktopLauncher"
 project.ext.assetsDir = new File("../assets")
