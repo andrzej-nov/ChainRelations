@@ -146,7 +146,7 @@ class CreditsScreen(
             val v = ctx.pointerPosition(Gdx.input.x, Gdx.input.y)
 
             if (v.y in 5f * gridY..6f * gridY)
-                Gdx.net.openURI("mailto:andrzej.novosiolov@gmail.com?subject=The%20Tangler%20game")
+                Gdx.net.openURI("mailto:andrzej.novosiolov@gmail.com?subject=The%20Chain%20Relations%20game")
             else if (v.y in 4f * gridY..5f * gridY)
                 Gdx.net.openURI("https://t.me/AndrzejN")
             else if (v.y in 3f * gridY..4f * gridY)
