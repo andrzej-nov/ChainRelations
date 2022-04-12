@@ -145,15 +145,19 @@ class GameScreen(
     private var inShowAMove = false
 
     private var lastGameSave: Long = 0
+    private var thereWasAMove = false
 
     /**
      * Autosaves the game every 5 seconds
      */
     private fun autoSaveGame() {
+        if (!thereWasAMove)
+            return
         val t = Calendar.getInstance().timeInMillis
         if (t - lastGameSave < 5000)
             return
         ctx.sav.saveGame(world)
+        thereWasAMove = false
         lastGameSave = t
     }
 
@@ -356,8 +360,10 @@ class GameScreen(
             .pushPause(0.2f)
             .push(Tween.call { _, _ ->
                 val dF = dragFrom
-                if (dF != null)
+                if (dF != null) {
                     world.addConnector(dF, dT)
+                    thereWasAMove = true
+                }
                 cleanDragState(true)
                 inShowAMove = false
             })
@@ -443,8 +449,10 @@ class GameScreen(
             if (dF != null) {
                 setDragTo(v)
                 val otherBall = world.ballPointedBy(dragTo)
-                if (otherBall != null && suitableTargets?.contains(otherBall) == true)
+                if (otherBall != null && suitableTargets?.contains(otherBall) == true) {
                     world.addConnector(dF, otherBall)
+                    thereWasAMove = true
+                }
             }
             cleanDragState(true)
             when {
