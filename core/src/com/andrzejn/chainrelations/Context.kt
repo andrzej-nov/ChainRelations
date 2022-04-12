@@ -26,6 +26,7 @@ import space.earlygrey.shapedrawer.ShapeDrawer
  * so everything should be passed in the Context object on each app object creation or method call
  * where it is needed.
  */
+@Suppress("ArrayInDataClass", "KDocMissingDocumentation")
 class Context(
     /**
      * Reference to the Main game object. Needed to switch game screens on different points of execution.
@@ -52,25 +53,29 @@ class Context(
      */
     val tweenManager: TweenManager = TweenManager()
 
+    /**
+     * Values and related functions that are constant for the duration of the game until the screen size changes
+     */
     lateinit var wc: WorldConstants
 
-    val gs = GameSettings()
+    /**
+     * The game settings
+     */
+    val gs: GameSettings = GameSettings()
 
-    val score = Score(this)
+    /**
+     * The game score tracker
+     */
+    val score: Score = Score(this)
 
-    val sav = SaveGame(this)
+    /**
+     * The game save/load handler
+     */
+    val sav: SaveGame = SaveGame(this)
 
     init { // Need to specify which objects' properties will be used for animations
         Tween.registerAccessor(Ball::class.java, BallAccessor())
         Tween.registerAccessor(Sprite::class.java, SpriteAccessor())
-    }
-
-    /**
-     * Not clearly documented but working method to check whether some transition animations are in progress
-     * (and ignore user input until animations complete, for example)
-     */
-    fun tweenAnimationRunning(): Boolean {
-        return tweenManager.objects.isNotEmpty()
     }
 
     /**
@@ -86,6 +91,9 @@ class Context(
         s.setSize(width, height)
     }
 
+    /**
+     * A variable for internal calculations, to reduce GC load
+     */
     private val v3 = Vector3()
 
     /**
@@ -111,6 +119,9 @@ class Context(
         // Then actual colors are specified on the drawing methon calls.
     }
 
+    /**
+     * Update camera on screen resize
+     */
     fun setCamera(width: Int, height: Int) {
         camera.setToOrtho(false, width.toFloat(), height.toFloat())
         camera.update()
@@ -133,7 +144,7 @@ class Context(
      */
     private fun texture(regionName: String): TextureRegion = atlas.asset.findRegion(regionName)
 
-    val white: TextureRegion get() = texture("white")
+    private val white: TextureRegion get() = texture("white")
     val ball: TextureRegion get() = texture("ball")
     val logo: TextureRegion get() = texture("logo")
     val home: TextureRegion get() = texture("home")
@@ -162,7 +173,8 @@ class Context(
      */
     fun createFont(height: Int): BitmapFont {
         with(FreeTypeFontGenerator(Gdx.files.internal("ADYS-Bold_V5.ttf"))) {
-            setMaxTextureSize(2048) // Required for same devices like Xiaomi, where the default 1024 causes garbled fonts
+            // Required for same devices like Xiaomi, where the default 1024 causes garbled fonts
+            setMaxTextureSize(2048)
             val font = generateFont(FreeTypeFontGenerator.FreeTypeFontParameter().also {
                 it.size = height
                 it.color = Color.WHITE
@@ -179,7 +191,7 @@ class Context(
     /**
      * Light (bright) colors palette for the tile lines
      */
-    val light: Array<Color> = arrayOf(
+    private val light: Array<Color> = arrayOf(
         Color.WHITE,
         Color(0xd1b153ff.toInt()),
         Color(0x6d9edbff),
@@ -193,7 +205,7 @@ class Context(
     /**
      * Darker colors palette for the tile lines' edges
      */
-    val dark: Array<Color> = arrayOf(
+    private val dark: Array<Color> = arrayOf(
         Color.LIGHT_GRAY,
         Color(0xbf9000ff.toInt()),
         Color(0x2265bcff),
@@ -204,6 +216,9 @@ class Context(
         Color(0x286d6dff)
     )
 
+    /**
+     * The UI colors theme
+     */
     data class Theme(
         val screenBackground: Color,
         val settingSelection: Color,
@@ -252,6 +267,9 @@ class Context(
         ballColor = Color.GRAY
     )
 
+    /**
+     * The current UI colors theme
+     */
     lateinit var theme: Theme
 
     /**

@@ -15,16 +15,28 @@ import ktx.app.KtxScreen
 import ktx.math.minus
 import java.util.*
 
-class GameScreen(val ctx: Context) : KtxScreen {
-    var maxConnLen: Float = ctx.gs.maxRadius // Maximum connector length, in ball radiuses
+/**
+ * The main game screen with the UI logic
+ */
+class GameScreen(
+    /**
+     * Reference to the main app context
+     */
+    val ctx: Context
+) : KtxScreen {
+    /**
+     * Maximum connector length, in ball radiuses. A copy of the game settings value, for better readability
+     * and slightly faster execution.
+     */
+    var maxConnLen: Float = ctx.gs.maxRadius
 
-    val ball = Sprite(ctx.ball)
-    val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
-    val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
-    val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
-    val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
-    val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
-    val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
+    private val ball = Sprite(ctx.ball)
+    private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
+    private val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
+    private val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
+    private val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
+    private val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
+    private val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
 
     /**
      * The input adapter instance for this screen
@@ -35,6 +47,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
 
     init {
         ctx.setTheme()
+        // Initialize WorldConstants before creating the World
         ctx.wc = WorldConstants(ctx.gs.ballsCount).also {
             it.setValues(
                 Gdx.graphics.width.toFloat(),
@@ -43,8 +56,14 @@ class GameScreen(val ctx: Context) : KtxScreen {
         }
     }
 
-    var world = World(ctx) // Create World only after WorldConstants
+    /**
+     * The game world
+     */
+    private var world: World = World(ctx) // Create World only after WorldConstants
 
+    /**
+     * Start new game and load saved one if any
+     */
     fun newGame(loadSavedGame: Boolean) {
         ctx.score.reset()
         updateInGameDuration()
@@ -64,6 +83,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
         resize(ctx.wc.width.toInt(), ctx.wc.height.toInt())
     }
 
+    /**
+     * Invoked on the screen show. Continuous rendering is needed by this screen.
+     */
     override fun show() {
         super.show()
         input.inputProcessor = ia
@@ -71,6 +93,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
         Gdx.graphics.isContinuousRendering = true
     }
 
+    /**
+     * Handles window resizing
+     */
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         ctx.setCamera(width, height)
@@ -106,16 +131,25 @@ class GameScreen(val ctx: Context) : KtxScreen {
         super.pause()
     }
 
+    /**
+     * Addns the last in-game duration to the total counter
+     */
     private fun updateInGameDuration() {
         ctx.gs.inGameDuration += Calendar.getInstance().timeInMillis - timeStart
         timeStart = Calendar.getInstance().timeInMillis
     }
 
-    var inShowAMove = false
+    /**
+     * If we are running the "Show a Move" animation
+     */
+    private var inShowAMove = false
 
     private var lastGameSave: Long = 0
 
-    fun autoSaveGame() {
+    /**
+     * Autosaves the game every 5 seconds
+     */
+    private fun autoSaveGame() {
         val t = Calendar.getInstance().timeInMillis
         if (t - lastGameSave < 5000)
             return
@@ -123,12 +157,18 @@ class GameScreen(val ctx: Context) : KtxScreen {
         lastGameSave = t
     }
 
-    fun ballBlinked() {
+    /**
+     * After a ball has blinked and changed its socker color, update the list of available moves
+     */
+    private fun ballBlinked() {
         suitableTargets = calcSuitableTargets(pointedBall, dragFrom)
         if (suitableTargets?.isEmpty() == true)
             cleanDragState(false)
     }
 
+    /**
+     * Invoked on each screen rendering. Recalculates ball moves, invokes timer actions and draws rthe screen.
+     */
     override fun render(delta: Float) {
         super.render(delta)
         try {
@@ -143,6 +183,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
             newGame(false)
         }
         if (!ctx.batch.isDrawing) ctx.batch.begin()
+        // Draw screen background and border panels
         ctx.sd.setColor(Color(ctx.theme.gameboardBackground))
         ctx.sd.filledRectangle(0f, 0f, ctx.wc.width, ctx.wc.height)
         ctx.sd.setColor(Color(ctx.theme.gameBorders).also { it.a = 0.8f })
@@ -154,6 +195,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
             ctx.wc.width - 2 * (ctx.wc.buttonSize + 5f),
             ctx.wc.fontHeight.toFloat() + 5f
         )
+
         val dF = dragFrom
         val pB = pointedBall
         if (dF != null) // Drag from connector in progress. Draw background drag limits circle.
@@ -162,7 +204,8 @@ class GameScreen(val ctx: Context) : KtxScreen {
         world.balls.filter { dF != null || it != pB }.forEach {
             setBallSpriteBounds(it.drawCoord, 1f)
             ball.color =
-                if (dF != null && suitableTargets?.contains(it) == true) ctx.theme.dark[dF.color] else ctx.theme.ballColor
+                if (dF != null && suitableTargets?.contains(it) == true) ctx.theme.dark[dF.color]
+                else ctx.theme.ballColor
             ball.draw(ctx.batch, it.alpha)
             it.drawDetails()
         }
@@ -185,6 +228,7 @@ class GameScreen(val ctx: Context) : KtxScreen {
                 ctx.wc.lineWidth * 2
             )
         }
+        // Draw buttons, scores and hand sprite on show-a-move
         play.draw(ctx.batch)
         help.draw(ctx.batch)
         hit.draw(ctx.batch)
@@ -196,18 +240,44 @@ class GameScreen(val ctx: Context) : KtxScreen {
         if (ctx.batch.isDrawing) ctx.batch.end()
     }
 
+    /**
+     * Ensures the ball is fully visible
+     */
     private fun setBallSpriteBounds(v: Vector2, k: Float) {
         val r = ctx.wc.radius
         ball.setBounds(v.x - r * k, v.y - r * k, r * 2 * k, r * 2 * k)
     }
 
-    var pointedBallCenter = Vector2(-1f, -1f)
-    var pointedBall: Ball? = null
-    var dragTo = Vector2(-1f, -1f)
-    var dragFrom: BaseSocket? = null
-    var suitableTargets: Set<Ball>? = null
+    /**
+     * Screen center of the pointed ball. May differ from the actual ball center because the pointed ball is drawn
+     * enlarged, and we need to ensure it is fully visible when it is near to the screen borders.
+     */
+    private var pointedBallCenter: Vector2 = Vector2(-1f, -1f)
 
-    fun pointTheBall(b: Ball?) {
+    /**
+     * Current poined ball, if any
+     */
+    private var pointedBall: Ball? = null
+
+    /**
+     * Current dragging screen coordinates, to draw the new connector line
+     */
+    private var dragTo: Vector2 = Vector2(-1f, -1f)
+
+    /**
+     * The socket from which we are drawing a new connector, if any
+     */
+    private var dragFrom: BaseSocket? = null
+
+    /**
+     * The list of suitable target balls for new connector, if any
+     */
+    private var suitableTargets: Set<Ball>? = null
+
+    /**
+     * Sets the pointed ball and prepares to draw it enlarged
+     */
+    private fun pointTheBall(b: Ball?) {
         pointedBall = b
         if (b == null)
             return
@@ -215,9 +285,17 @@ class GameScreen(val ctx: Context) : KtxScreen {
         world.clampCoord(pointedBallCenter, ctx.wc.radius * 2)
     }
 
+    /**
+     * Auto-selected target ball for the "Show a Move" animation.
+     */
     private var dTforShow: Ball? = null
 
-    fun showAMove() {
+    /**
+     * Performs the "Show a Move" animation and actions. The animations are split to 3 methods because the next
+     * animation targets depend on the result of prior actions.
+     * First part: pick the ball to drag from.
+     */
+    private fun showAMove() {
         cleanDragState(true)
         if (inShowAMove)
             return
@@ -242,6 +320,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
             .start(ctx.tweenManager)
     }
 
+    /**
+     * Second part of the "Show a Move" animation. Pick the socket to drag from.
+     */
     private fun showAMoveMiddle(dF: BaseSocket) {
         val dFCoord = Vector2(dF.coord).scl(2f).add(pointedBallCenter)
         Timeline.createSequence()
@@ -257,7 +338,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
             .start(ctx.tweenManager)
     }
 
-    fun showAMoveFinalize() {
+    /**
+     * Third and final part of the "Show a Move" animation. Drag to the target ball.
+     */
+    private fun showAMoveFinalize() {
         val dT = dTforShow
         if (dT == null) {
             cleanDragState(true)
@@ -280,7 +364,10 @@ class GameScreen(val ctx: Context) : KtxScreen {
             .start(ctx.tweenManager)
     }
 
-    fun cleanDragState(cleanPointedBall: Boolean) {
+    /**
+     * Clean up after drag end.
+     */
+    private fun cleanDragState(cleanPointedBall: Boolean) {
         if (cleanPointedBall)
             pointedBall = null
         dragFrom = null
@@ -288,7 +375,11 @@ class GameScreen(val ctx: Context) : KtxScreen {
         dragTo.set(-1f, -1f)
     }
 
-    fun calcSuitableTargets(
+    /**
+     * Get the list of available drag tarhet balls, taking into account current drag-from socket color
+     * and maximum drag radius from the game settings
+     */
+    private fun calcSuitableTargets(
         pB: Ball?,
         dF: BaseSocket?
     ): Set<Ball>? {
@@ -366,8 +457,14 @@ class GameScreen(val ctx: Context) : KtxScreen {
             return super.touchUp(screenX, screenY, pointer, button)
         }
 
+        /**
+         * Checks if particular button is touched.
+         */
         private fun buttonTouched(v: Vector2, s: Sprite) = v.x in s.x..s.x + s.width && v.y in s.y..s.y + s.height
 
+        /**
+         * Set the drag-from socket pointed by the coordinates and update the list of available target balls
+         */
         private fun setDragFrom(v: Vector2) {
             val pB = pointedBall ?: return
             val v1 = v.minus(pointedBallCenter).scl(0.5f)
@@ -380,6 +477,9 @@ class GameScreen(val ctx: Context) : KtxScreen {
                 dragFrom = null
         }
 
+        /**
+         * Set the drag-to coordinates, limiting the new connector to the maxium connector length from the settings
+         */
         private fun setDragTo(v: Vector2) {
             val dF = dragFrom ?: return
             val dragFromCoord = dF.absDrawCoord()

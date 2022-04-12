@@ -9,9 +9,25 @@ import com.badlogic.gdx.math.Vector2
 import java.util.*
 import kotlin.random.Random
 
-class World(val ctx: Context) {
+/**
+ * The main game world and logic
+ */
+class World(
+    /**
+     * Reference to the main app context
+     */
+    val ctx: Context
+) {
     private var cnt = 1
+
+    /**
+     * The list of the balls in game
+     */
     var balls: List<Ball> = List(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
+
+    /**
+     * The ball connectors
+     */
     private val connectors = mutableListOf<Connector>()
 
     init {
@@ -27,6 +43,9 @@ class World(val ctx: Context) {
         }
     }
 
+    /**
+     * Update layout for the current window size
+     */
     fun resize(width: Float, height: Float) {
         val buttonSize = ctx.wc.buttonSize
         val kx = (width - 2 * buttonSize) / (ctx.wc.width - 2 * buttonSize)
@@ -39,6 +58,9 @@ class World(val ctx: Context) {
         connectors.forEach { it.attraction = ctx.wc.attraction }
     }
 
+    /**
+     * Calculate repulsion forces for all balls
+     */
     private tailrec fun calcRepulsions(ball: List<Ball>) {
         if (ball.size <= 1)
             return
@@ -47,6 +69,10 @@ class World(val ctx: Context) {
         this.calcRepulsions(b)
     }
 
+    /**
+     * Apply all ball forces and move them. Performs 20 steps of the numerical integration, it is just enough
+     * for smooth ball moving.
+     */
     fun moveBalls(delta: Float) {
         val calcSteps = 20 // Enough for smooth calcuations on fps 60
         repeat(calcSteps) {
@@ -62,6 +88,9 @@ class World(val ctx: Context) {
         }
     }
 
+    /**
+     * Ensure the ball remains on the screen.
+     */
     fun clampCoord(crd: Vector2, rad: Float) {
         val br = rad * 1.1f // don't let the balls touch walls
         crd.set(
@@ -70,10 +99,14 @@ class World(val ctx: Context) {
         )
     }
 
-    fun ballPointedBy(v: Vector2): Ball? {
-        return balls.firstOrNull { !it.inDeath && it.coord.dst(v) < ctx.wc.radius }
-    }
+    /**
+     * Returns the ball pointed by the coords, or null if there is no ball.
+     */
+    fun ballPointedBy(v: Vector2): Ball? = balls.firstOrNull { !it.inDeath && it.coord.dst(v) < ctx.wc.radius }
 
+    /**
+     * Add the connector from the socket to the ball. Updates scores, triggers death of fully connected balls if any
+     */
     fun addConnector(from: BaseSocket, otherBall: Ball): Boolean {
         val fromBall = from.ball
         val con = if (from is InSocket) {
@@ -116,6 +149,9 @@ class World(val ctx: Context) {
         return true
     }
 
+    /**
+     * Renders all ball connectors
+     */
     fun drawConnectors(): Unit = connectors.forEach {
         ctx.sd.setColor(ctx.theme.dark[it.color])
         ctx.sd.line(
@@ -125,15 +161,19 @@ class World(val ctx: Context) {
         )
     }
 
-    fun randomHit() {
-        balls.forEach {
-            it.coord.add(ctx.wc.randomCoordHit, ctx.wc.randomCoordHit)
-            clampCoord(it.coord, ctx.wc.radius)
-        }
+    /**
+     * Hit the field, shifting balls by random offsets (to give an inconveniently stuck ball a chance to reposition)
+     */
+    fun randomHit(): Unit = balls.forEach {
+        it.coord.add(ctx.wc.randomCoordHit, ctx.wc.randomCoordHit)
+        clampCoord(it.coord, ctx.wc.radius)
     }
 
     private var lastBlinkTime: Long = 0
 
+    /**
+     * Picks a random ball and initiates its blinking, with a random free socket color change
+     */
     fun blinkRandomBall(ballBlinked: () -> Unit) {
         val t = Calendar.getInstance().timeInMillis
         if (t - lastBlinkTime < 3000)
@@ -152,6 +192,9 @@ class World(val ctx: Context) {
             .start(ctx.tweenManager)
     }
 
+    /**
+     * Serialize the whole world for game save
+     */
     fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
         sb.append(ctx.wc.width.toInt(), 4).append(ctx.wc.height.toInt(), 4)
         sb.append(balls.size, 2)
@@ -160,6 +203,9 @@ class World(val ctx: Context) {
         connectors.forEach { it.serialize(sb) }
     }
 
+    /**
+     * Deserialize the whole world for game load
+     */
     fun deserialize(s: String) {
         val width = s.substring(16..19).toFloat()
         val height = s.substring(20..23).toFloat()

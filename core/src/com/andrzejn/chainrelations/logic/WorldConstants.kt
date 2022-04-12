@@ -58,12 +58,35 @@ class WorldConstants(
      * Width of the left/right screen side panels with buttons
      */
     private var sideDist: Float = 0f
+
+    /**
+     * Squared distance to apply the barrier force
+     */
     private var borderDist: Float = 0f
+
+    /**
+     * Connector attraction force
+     */
     var attraction: Float = 0f
+
+    /**
+     * Screen width
+     */
     var width: Float = 1f
+
+    /**
+     * Screen height
+     */
     var height: Float = 1f
+
+    /**
+     * Size of the control buttons
+     */
     var buttonSize: Float = 0f
 
+    /**
+     * Recalculate all values on screen resize
+     */
     fun setValues(w: Float, h: Float) {
         width = w
         height = h
@@ -80,6 +103,9 @@ class WorldConstants(
         attraction = 6f * radius
     }
 
+    /**
+     * Calculate the suitable ball size based on the screen size and number of balls in game.
+     */
     private fun calcRadius(): Float {
         val minSide = min(width - 2 * buttonSize, height)
         val maxSide = max(width - 2 * buttonSize, height)
@@ -93,10 +119,16 @@ class WorldConstants(
         }
     }
 
+    /**
+     * Repulsion force based on the distance between two balls
+     */
     fun repulsion(distSquared: Float): Float =
         if (distSquared <= borderDist) barrierForce else
             if (distSquared > 9 * radSquared) 0f else baseRepulsion / distSquared
 
+    /**
+     * Apply barrier forces when the ball is close to borders
+     */
     fun applyBorderForce(b: Ball) {
         with(b.force[0]) {
             if (b.coord.x < sideDist + buttonSize) x += barrierForce
@@ -106,6 +138,9 @@ class WorldConstants(
         }
     }
 
+    /**
+     * Random coordinate shift on the wold hit.
+     */
     val randomCoordHit: Float get() = Random.nextFloat() * 3 * radius - 1.5f * radius
 
 }

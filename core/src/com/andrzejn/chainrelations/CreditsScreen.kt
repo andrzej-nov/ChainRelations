@@ -12,7 +12,12 @@ import ktx.app.KtxScreen
 /**
  * The simplest screen. Just displays the credits and opens respective links.
  */
-class CreditsScreen(val ctx: Context) : KtxScreen {
+class CreditsScreen(
+    /**
+     * Reference to the main app context
+     */
+    val ctx: Context
+) : KtxScreen {
     private val ia = IAdapter()
     private var font: BitmapFont = BitmapFont()
     private lateinit var fcText: BitmapFontCache

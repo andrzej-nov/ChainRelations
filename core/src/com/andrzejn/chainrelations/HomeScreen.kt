@@ -16,7 +16,12 @@ import kotlin.math.min
  * First screen of the application. Displayed by the Main class after the application is created.
  * (unless there is a saved game, then we go directly to the game screen with the resumed game).
  */
-class HomeScreen(val ctx: Context) : KtxScreen {
+class HomeScreen(
+    /**
+     * Reference to the main scenn context
+     */
+    val ctx: Context
+) : KtxScreen {
     private val ia = IAdapter()
     private var fontItems: BitmapFont = BitmapFont()
     private lateinit var fcItems: BitmapFontCache
@@ -255,6 +260,9 @@ class HomeScreen(val ctx: Context) : KtxScreen {
      */
     inner class IAdapter : InputAdapter() {
 
+        /**
+         * Handle dragging
+         */
         override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
             dragSliders()
             return super.touchDragged(screenX, screenY, pointer)

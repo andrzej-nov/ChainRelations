@@ -1,6 +1,5 @@
 package com.andrzejn.chainrelations
 
-import com.badlogic.gdx.Gdx.graphics
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 
@@ -40,6 +39,9 @@ class Main : KtxGame<KtxScreen>() {
             setScreen<HomeScreen>()
     }
 
+    /**
+     * Handles the game resume when switching back from background
+     */
     override fun resume() {
         super.resume()
         ctx.reloadAtlas()
