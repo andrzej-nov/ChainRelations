@@ -34,7 +34,7 @@ The game is provided in two options:
       .
 
 - **Android**. [Get it on Google Play](https://play.google.com/store/apps/details?id=com.andrzejn.chainrelations)
-  (recommended, but not available yet because of the Google Play approval lag) or
+  (recommended) or
   [download the ChainRelations.apk](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.1/ChainRelations.apk)
   here for manual install (it might be sometimes also a newer version than on the Google Play). It has been tested
   on Android 8.0 and 10.0, should also work on any Android version starting from 4.4 and later.
