@@ -50,7 +50,7 @@ class CreditsScreen(
     private val icontelegram = Sprite(ctx.icontelegram)
     private val icongithub = Sprite(ctx.icongithub)
     private val exit = Sprite(ctx.exit)
-    private val home = Sprite(ctx.home)
+    private val home = Sprite(ctx.settings)
 
     /**
      * Invoked on each screen resize

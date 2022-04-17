@@ -32,7 +32,7 @@ class GameScreen(
 
     private val ball = Sprite(ctx.ball)
     private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
-    private val home = Sprite(ctx.home).also { it.setAlpha(0.8f) }
+    private val home = Sprite(ctx.settings).also { it.setAlpha(0.8f) }
     private val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
     private val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
     private val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }

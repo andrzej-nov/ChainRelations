@@ -147,12 +147,14 @@ class Context(
     private val white: TextureRegion get() = texture("white")
     val ball: TextureRegion get() = texture("ball")
     val logo: TextureRegion get() = texture("logo")
-    val home: TextureRegion get() = texture("home")
+
     val play: TextureRegion get() = texture("play")
-    val exit: TextureRegion get() = texture("poweroff")
-    val options: TextureRegion get() = texture("options")
+    val settings: TextureRegion get() = texture("settings")
+    val exit: TextureRegion get() = texture("exit")
     val help: TextureRegion get() = texture("help")
-    val hit: TextureRegion get() = texture("cancel")
+    val info: TextureRegion get() = texture("info")
+    val hit: TextureRegion get() = texture("hit")
+
     val hand: TextureRegion get() = texture("hand")
     val gear: TextureRegion get() = texture("gear")
     val icongmail: TextureRegion get() = texture("icongmail")

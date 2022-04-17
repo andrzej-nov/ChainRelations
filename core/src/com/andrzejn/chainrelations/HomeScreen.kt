@@ -49,7 +49,7 @@ class HomeScreen(
     private val logo = Sprite(ctx.logo)
     private val play = Sprite(ctx.play)
     private val exit = Sprite(ctx.exit)
-    private val options = Sprite(ctx.options)
+    private val options = Sprite(ctx.info)
     private val gear = Sprite(ctx.gear)
     private val darktheme = Sprite(ctx.darktheme)
     private val lighttheme = Sprite(ctx.lighttheme)
