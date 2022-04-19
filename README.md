@@ -6,10 +6,10 @@ https://user-images.githubusercontent.com/89737218/162968270-6aa30746-8165-4126-
 
 ![Clipboard02!](https://user-images.githubusercontent.com/89737218/162968539-faea3fec-6ec0-41f7-a611-4dee8a661d09.jpg)
 
-**Game objective:** connect the balls' same-colored inputs to outputs. Completely connected balls disappear
-and are replaced with new ones. The possible connection range is limited, so plan your moves.
+**Game objective:** connect the balls' same-colored inputs to outputs. Completely connected balls disappear.
+The possible connection range is limited, so plan your moves.
 
-You can adjust balls count, connection range, and put additional color to the board.
+You can adjust balls count, connection range, whether the balls are respawned, and put additional color to the board.
 
 Hint: from time to time balls blink and randomly change their colors one by one, so if you are out of the moves,
 you can just wait a bit.
@@ -25,7 +25,7 @@ of the game.
 
 The game is provided in two options:
 
-- **Desktop Java**. [Download ChainRelations.jar](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.1/ChainRelations.jar).
+- **Desktop Java**. [Download ChainRelations.jar](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.2/ChainRelations.jar).
   Run it with `java -jar ChainRelations.jar` command line, or in most cases just double-click the ChainRelations.jar 
   file. It has been tested with Java 18 Runtime, should also work with prior versions up to Java 8.
     - **On MacOS** you will get a warning about unidentified developer. Start the ChainRelations.jar 
@@ -35,7 +35,7 @@ The game is provided in two options:
 
 - **Android**. [Get it on Google Play](https://play.google.com/store/apps/details?id=com.andrzejn.chainrelations)
   (recommended) or
-  [download the ChainRelations.apk](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.1/ChainRelations.apk)
+  [download the ChainRelations.apk](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.2/ChainRelations.apk)
   here for manual install (it might be sometimes also a newer version than on the Google Play). It has been tested
   on Android 8.0 and 10.0, should also work on any Android version starting from 4.4 and later.
 
