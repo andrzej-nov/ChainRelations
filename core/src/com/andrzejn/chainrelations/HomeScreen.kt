@@ -61,6 +61,8 @@ class HomeScreen(
     private val colors7 = Sprite(ctx.colors7)
     private val sBallsCount = Slider(ctx, 20f, 60f, ctx.gs.ballsCount.toFloat(), 1f)
     private val sMaxRadius = Slider(ctx, 3f, 6f, ctx.gs.maxRadius, 0.1f)
+    private val recycle = Sprite(ctx.recycle)
+    private val death = Sprite(ctx.death)
 
     private var gridX = 0f
     private var gridY = 0f
@@ -80,46 +82,56 @@ class HomeScreen(
         baseWidth = min(ctx.camera.viewportWidth, baseHeight * 3 / 4)
         baseX = (ctx.camera.viewportWidth - baseWidth) / 2
         gridX = baseWidth / 12
-        gridY = baseHeight / 8
+        gridY = baseHeight / 9
         radius = min(2 * gridX, gridY) * 0.4f
 
         ctx.fitToRect(logo, baseWidth, 2 * gridY * 0.8f)
         logo.setPosition(
             (baseWidth - logo.width) / 2 + baseX,
-            gridY * 7 - logo.height / 2
+            gridY * 8 - logo.height / 2
         )
 
-        sBallsCount.setBounds(2 * gridX + baseX, gridY * 5, 8 * gridX, gridY)
+        sBallsCount.setBounds(2 * gridX + baseX, gridY * 6, 8 * gridX, gridY)
         ctx.fitToRect(largeballs, gridX, gridY)
         largeballs.setPosition(
             gridX - largeballs.width / 2 + baseX,
-            gridY * 5
+            gridY * 6
         )
         ctx.fitToRect(smallballs, gridX, gridY)
         smallballs.setPosition(
             gridX * 11 - smallballs.width / 2 + baseX,
-            gridY * 5
+            gridY * 6
         )
-        sMaxRadius.setBounds(2 * gridX + baseX, gridY * 4, 8 * gridX, gridY)
+        sMaxRadius.setBounds(2 * gridX + baseX, gridY * 5, 8 * gridX, gridY)
         ctx.fitToRect(smallradius, gridX, gridY)
         smallradius.setPosition(
             gridX - smallradius.width / 2 + baseX,
-            gridY * 4
+            gridY * 5
         )
         ctx.fitToRect(largeradius, gridX, gridY)
         largeradius.setPosition(
             gridX * 11 - largeradius.width / 2 + baseX,
-            gridY * 4
+            gridY * 5
         )
         ctx.fitToRect(colors6, 3 * gridX * 0.7f, gridY * 0.7f)
         colors6.setPosition(
             4 * gridX - colors6.width / 2 + baseX,
-            gridY * 3 + (gridY - colors6.height) / 2
+            gridY * 4 + (gridY - colors6.height) / 2
         )
         ctx.fitToRect(colors7, 3 * gridX * 0.7f, gridY * 0.7f)
         colors7.setPosition(
             8 * gridX - colors7.width / 2 + baseX,
-            gridY * 3 + (gridY - colors7.height) / 2
+            gridY * 4 + (gridY - colors7.height) / 2
+        )
+        ctx.fitToRect(recycle, 3 * gridX * 0.7f, gridY * 0.7f)
+        recycle.setPosition(
+            4 * gridX - recycle.width / 2 + baseX,
+            gridY * 3 + (gridY - recycle.height) / 2
+        )
+        ctx.fitToRect(death, 3 * gridX * 0.7f, gridY * 0.7f)
+        death.setPosition(
+            8 * gridX - death.width / 2 + baseX,
+            gridY * 3 + (gridY - death.height) / 2
         )
         ctx.fitToRect(darktheme, 3 * gridX * 0.7f, gridY * 0.7f)
         darktheme.setPosition(
@@ -135,10 +147,11 @@ class HomeScreen(
         fontItems.dispose()
         fontItems = ctx.createFont((gridY * 0.3f).toInt())
         fcItems = BitmapFontCache(fontItems)
-        fcItems.addText("1.", baseX * 0.2f, gridY * 5 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
-        fcItems.addText("2.", baseX * 0.2f, gridY * 4 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
-        fcItems.addText("3.", baseX * 0.2f, gridY * 3 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
-        fcItems.addText("4.", baseX * 0.2f, gridY * 2 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
+        fcItems.addText("1.", baseX * 0.2f, gridY * 6 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
+        fcItems.addText("2.", baseX * 0.2f, gridY * 5 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
+        fcItems.addText("3.", baseX * 0.2f, gridY * 4 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
+        fcItems.addText("4.", baseX * 0.2f, gridY * 3 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
+        fcItems.addText("5.", baseX * 0.2f, gridY * 2 + fontItems.lineHeight * 1.5f, baseX * 0.7f, Align.right, false)
         fcItems.setColors(ctx.theme.settingItem)
 
         ctx.fitToRect(gear, 2 * gridX * 0.5f, gridY * 0.5f)
@@ -182,14 +195,16 @@ class HomeScreen(
         colors7.draw(ctx.batch)
         darktheme.draw(ctx.batch)
         lighttheme.draw(ctx.batch)
+        recycle.draw(ctx.batch)
+        death.draw(ctx.batch)
         if (baseX / fontItems.lineHeight > 15f / 22f)
             fcItems.draw(ctx.batch)
 
         ctx.sd.line(
             baseX,
-            6 * gridY,
+            7 * gridY,
             12 * gridX + baseX,
-            6 * gridY,
+            7 * gridY,
             ctx.theme.settingSeparator,
             lineWidth
         )
@@ -202,9 +217,9 @@ class HomeScreen(
             lineWidth
         )
 
-        gear.setPosition(-gear.width / 2 + baseX, 6 * gridY - gear.height / 2)
+        gear.setPosition(-gear.width / 2 + baseX, 7 * gridY - gear.height / 2)
         gear.draw(ctx.batch)
-        gear.setPosition(12 * gridX - gear.width / 2 + baseX, 6 * gridY - gear.height / 2)
+        gear.setPosition(12 * gridX - gear.width / 2 + baseX, 7 * gridY - gear.height / 2)
         gear.draw(ctx.batch)
         gear.setPosition(-gear.width / 2 + baseX, 1.9f * gridY - gear.height / 2)
         gear.draw(ctx.batch)
@@ -223,8 +238,19 @@ class HomeScreen(
         sMaxRadius.normalizeValue(ctx.gs.maxRadius)
         sBallsCount.normalizeValue(ctx.gs.ballsCount.toFloat())
 
-        var y = gridY * 3.05f
+        var y = gridY * 4.05f
         var x = gridX * ((if (ctx.gs.colorsCount == 6) 3f else 7f) - 0.2f) + baseX
+        ctx.sd.filledRectangle(
+            x,
+            y,
+            2.4f * gridX,
+            gridY * 0.9f,
+            0f,
+            ctx.theme.settingSelection, ctx.theme.settingSelection
+        )
+
+        y -= gridY
+        x = gridX * ((if (ctx.gs.isRecycle) 3f else 7f) - 0.2f) + baseX
         ctx.sd.filledRectangle(
             x,
             y,
@@ -278,11 +304,16 @@ class HomeScreen(
                 return super.touchDown(screenX, screenY, pointer, button)
             v.x -= baseX
 
-            if (v.y in 3 * gridY..4 * gridY) {
+            if (v.y in 4 * gridY..5 * gridY) {
                 if (v.x in 3 * gridX..5 * gridX)
                     ctx.gs.colorsCount = 6
                 else if (v.x in 7 * gridX..9 * gridX)
                     ctx.gs.colorsCount = 7
+            } else if (v.y in 3 * gridY..4 * gridY) {
+                if (v.x in 3 * gridX..5 * gridX)
+                    ctx.gs.isRecycle = true
+                else if (v.x in 7 * gridX..9 * gridX)
+                    ctx.gs.isRecycle = false
             } else if (v.y in 2 * gridY..3 * gridY) {
                 if (v.x in 3 * gridX..5 * gridX) {
                     ctx.gs.isDarkTheme = true

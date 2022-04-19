@@ -11,6 +11,7 @@ class GameSettings {
     private val sMAXRADIUS = "maxRadius"
     private val sBALLSCOUNT = "ballsCount"
     private val sCOLORSCOUNT = "colorsCount"
+    private val sISRECYCLE = "isRecycle"
     private val sSAVEDGAME = "savedGame"
     private val sDARKTHEME = "darkTheme"
     private val sINGAMEDURATION = "inGameDuration"
@@ -19,6 +20,7 @@ class GameSettings {
     private var iMaxRadius: Float = 4.5f
     private var iBallsCount: Int = 20
     private var iColorsCount: Int = 6
+    private var iIsRecycle: Boolean = true
     private var iDarkTheme: Boolean = true
     private var iInGameDuration: Long = 0
 
@@ -35,7 +37,10 @@ class GameSettings {
         iColorsCount = pref.getInteger(sCOLORSCOUNT, 6)
         iColorsCount = iColorsCount.coerceIn(6, 7)
         colorsCount = iColorsCount
+        iIsRecycle = pref.getBoolean(sISRECYCLE, true)
+        isRecycle = iIsRecycle
         iDarkTheme = pref.getBoolean(sDARKTHEME, true)
+        isDarkTheme = iDarkTheme
         iInGameDuration = pref.getLong(sINGAMEDURATION, 0)
     }
 
@@ -69,6 +74,17 @@ class GameSettings {
         set(value) {
             iColorsCount = value
             pref.putInteger(sCOLORSCOUNT, value)
+            pref.flush()
+        }
+
+    /**
+     * Are dead balls respawn or die permanently
+     */
+    var isRecycle: Boolean
+        get() = iIsRecycle
+        set(value) {
+            iIsRecycle = value
+            pref.putBoolean(sISRECYCLE, value)
             pref.flush()
         }
 
@@ -108,7 +124,7 @@ class GameSettings {
      * Key name for storing the records for the current tile type - game size - colors
      */
     private fun keyName(prefix: String): String {
-        return "$prefix$iBallsCount$iColorsCount${serializeFloat(iMaxRadius)}"
+        return "$prefix$iBallsCount$iColorsCount${serializeFloat(iMaxRadius)}$isRecycle"
     }
 
     /***
@@ -140,23 +156,25 @@ class GameSettings {
      * Serialize game settings, to include into the saved game. Always 6 characters.
      */
     fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
-        sb.append(serializeFloat(iMaxRadius)).append(ballsCount).append(colorsCount)
+        sb.append(serializeFloat(iMaxRadius)).append(ballsCount).append(colorsCount).append(if (isRecycle) 1 else 0)
     }
 
     /**
      * Deserialize game settings from the saved game
      */
     fun deserialize(s: String): Boolean {
-        if (s.length != 6) {
+        if (s.length != 7) {
             reset()
             return false
         }
         val mr = s.substring(0..2).toFloatOrNull()
         val bc = s.substring(3..4).toIntOrNull()
         val cc = s[5].digitToIntOrNull()
-        if ((mr == null || mr !in 3f..6f)
+        val ir = s[6].digitToIntOrNull()
+        if (mr == null || mr !in 3f..6f
             || bc == null || bc !in 20..60
             || cc == null || cc !in 6..7
+            || ir == null || ir !in 0..1
         ) {
             reset()
             return false
@@ -164,6 +182,7 @@ class GameSettings {
         maxRadius = mr
         ballsCount = bc
         colorsCount = cc
+        isRecycle = ir != 0
         return true
     }
 }

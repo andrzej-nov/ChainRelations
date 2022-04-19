@@ -50,8 +50,7 @@ class GameScreen(
         // Initialize WorldConstants before creating the World
         ctx.wc = WorldConstants(ctx.gs.ballsCount).also {
             it.setValues(
-                Gdx.graphics.width.toFloat(),
-                Gdx.graphics.height.toFloat()
+                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()
             )
         }
     }
@@ -71,15 +70,14 @@ class GameScreen(
         ctx.wc.ballsCount = ctx.gs.ballsCount
         world = World(ctx)
         maxConnLen = ctx.gs.maxRadius
-        if (loadSavedGame)
-            try {
-                val s = ctx.sav.savedGame()
-                ctx.sav.loadSettingsAndScore(s)
-                world.deserialize(s)
-            } catch (ex: Exception) {
-                // Something wrong. Just recreate new World and start new game
-                world = World(ctx)
-            }
+        if (loadSavedGame) try {
+            val s = ctx.sav.savedGame()
+            ctx.sav.loadSettingsAndScore(s)
+            world.deserialize(s)
+        } catch (ex: Exception) {
+            // Something wrong. Just recreate new World and start new game
+            world = World(ctx)
+        }
         resize(ctx.wc.width.toInt(), ctx.wc.height.toInt())
     }
 
@@ -151,11 +149,9 @@ class GameScreen(
      * Autosaves the game every 5 seconds
      */
     private fun autoSaveGame() {
-        if (!thereWasAMove)
-            return
+        if (!thereWasAMove) return
         val t = Calendar.getInstance().timeInMillis
-        if (t - lastGameSave < 5000)
-            return
+        if (t - lastGameSave < 5000) return
         ctx.sav.saveGame(world)
         thereWasAMove = false
         lastGameSave = t
@@ -166,8 +162,7 @@ class GameScreen(
      */
     private fun ballBlinked() {
         suitableTargets = calcSuitableTargets(pointedBall, dragFrom)
-        if (suitableTargets?.isEmpty() == true)
-            cleanDragState(false)
+        if (suitableTargets?.isEmpty() == true) cleanDragState(false)
     }
 
     /**
@@ -178,8 +173,7 @@ class GameScreen(
         try {
             world.moveBalls(delta)
             autoSaveGame()
-            if (!inShowAMove)
-                world.blinkRandomBall { ballBlinked() }
+            if (!inShowAMove) world.blinkRandomBall { ballBlinked() }
             ctx.tweenManager.update(delta)
             world.balls.filter { it.inBlink || it.inDeath }.forEach { it.updateEyeCoords() }
         } catch (ex: Exception) {
@@ -194,10 +188,7 @@ class GameScreen(
         ctx.sd.filledRectangle(0f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
         ctx.sd.filledRectangle(ctx.wc.width - ctx.wc.buttonSize - 5f, 0f, ctx.wc.buttonSize + 5f, ctx.wc.height)
         ctx.sd.filledRectangle(
-            ctx.wc.buttonSize + 5f,
-            0f,
-            ctx.wc.width - 2 * (ctx.wc.buttonSize + 5f),
-            ctx.wc.fontHeight.toFloat() + 5f
+            ctx.wc.buttonSize + 5f, 0f, ctx.wc.width - 2 * (ctx.wc.buttonSize + 5f), ctx.wc.fontHeight.toFloat() + 5f
         )
 
         val dF = dragFrom
@@ -207,9 +198,8 @@ class GameScreen(
         world.drawConnectors()
         world.balls.filter { dF != null || it != pB }.forEach {
             setBallSpriteBounds(it.drawCoord, 1f)
-            ball.color =
-                if (dF != null && suitableTargets?.contains(it) == true) ctx.theme.dark[dF.color]
-                else ctx.theme.ballColor
+            ball.color = if (dF != null && suitableTargets?.contains(it) == true) ctx.theme.dark[dF.color]
+            else ctx.theme.ballColor
             ball.draw(ctx.batch, it.alpha)
             it.drawDetails()
         }
@@ -233,14 +223,20 @@ class GameScreen(
             )
         }
         // Draw buttons, scores and hand sprite on show-a-move
+        if (world.balls.size <= 6) ctx.sd.filledRectangle(
+            play.x - 5,
+            play.y - 5,
+            play.width + 10,
+            play.height + 10,
+            ctx.theme.scorePoints
+        )
         play.draw(ctx.batch)
         help.draw(ctx.batch)
         hit.draw(ctx.batch)
         exit.draw(ctx.batch)
         home.draw(ctx.batch)
         ctx.score.draw(ctx.batch)
-        if (inShowAMove)
-            hand.draw(ctx.batch)
+        if (inShowAMove) hand.draw(ctx.batch)
         if (ctx.batch.isDrawing) ctx.batch.end()
     }
 
@@ -283,8 +279,7 @@ class GameScreen(
      */
     private fun pointTheBall(b: Ball?) {
         pointedBall = b
-        if (b == null)
-            return
+        if (b == null) return
         pointedBallCenter.set(b.drawCoord)
         world.clampCoord(pointedBallCenter, ctx.wc.radius * 2)
     }
@@ -301,8 +296,7 @@ class GameScreen(
      */
     private fun showAMove() {
         cleanDragState(true)
-        if (inShowAMove)
-            return
+        if (inShowAMove) return
         inShowAMove = true
         val dF = world.balls.filter { !it.inBlink && !it.inDeath }.flatMap { it.sockets }.filter { it.conn == null }
             .shuffled().firstOrNull { calcSuitableTargets(it.ball, it)?.isNotEmpty() == true }
@@ -311,16 +305,13 @@ class GameScreen(
             return
         }
 
-        Timeline.createSequence()
-            .push(Tween.call { _, _ ->
+        Timeline.createSequence().push(Tween.call { _, _ ->
                 hand.setPosition(
-                    help.x + help.width / 2 - hand.width / 2,
-                    help.y + help.height / 2 - hand.height
+                    help.x + help.width / 2 - hand.width / 2, help.y + help.height / 2 - hand.height
                 )
             })
             .push(Tween.to(hand, TW_POS_XY, 1f).target(dF.ball.coord.x - hand.width / 2, dF.ball.coord.y - hand.height))
-            .push(Tween.call { _, _ -> pointTheBall(dF.ball) })
-            .setCallback { _, _ -> showAMoveMiddle(dF) }
+            .push(Tween.call { _, _ -> pointTheBall(dF.ball) }).setCallback { _, _ -> showAMoveMiddle(dF) }
             .start(ctx.tweenManager)
     }
 
@@ -329,17 +320,13 @@ class GameScreen(
      */
     private fun showAMoveMiddle(dF: BaseSocket) {
         val dFCoord = Vector2(dF.coord).scl(2f).add(pointedBallCenter)
-        Timeline.createSequence()
-            .pushPause(0.2f)
+        Timeline.createSequence().pushPause(0.2f)
             .push(Tween.to(hand, TW_POS_XY, 0.5f).target(dFCoord.x - hand.width / 2, dFCoord.y - hand.height))
-            .pushPause(0.3f)
-            .push(Tween.call { _, _ ->
+            .pushPause(0.3f).push(Tween.call { _, _ ->
                 dragFrom = dF
                 suitableTargets = calcSuitableTargets(dF.ball, dF)
                 dTforShow = suitableTargets?.firstOrNull { !it.inDeath && !it.inBlink }
-            })
-            .setCallback { _, _ -> showAMoveFinalize() }
-            .start(ctx.tweenManager)
+            }).setCallback { _, _ -> showAMoveFinalize() }.start(ctx.tweenManager)
     }
 
     /**
@@ -352,13 +339,9 @@ class GameScreen(
             inShowAMove = false
             return
         }
-        Timeline.createSequence()
-            .push(
-                Tween.to(hand, TW_POS_XY, 1f)
-                    .target(dT.coord.x - hand.width / 2, dT.coord.y - hand.height)
-            )
-            .pushPause(0.2f)
-            .push(Tween.call { _, _ ->
+        Timeline.createSequence().push(
+                Tween.to(hand, TW_POS_XY, 1f).target(dT.coord.x - hand.width / 2, dT.coord.y - hand.height)
+            ).pushPause(0.2f).push(Tween.call { _, _ ->
                 val dF = dragFrom
                 if (dF != null) {
                     world.addConnector(dF, dT)
@@ -366,16 +349,14 @@ class GameScreen(
                 }
                 cleanDragState(true)
                 inShowAMove = false
-            })
-            .start(ctx.tweenManager)
+            }).start(ctx.tweenManager)
     }
 
     /**
      * Clean up after drag end.
      */
     private fun cleanDragState(cleanPointedBall: Boolean) {
-        if (cleanPointedBall)
-            pointedBall = null
+        if (cleanPointedBall) pointedBall = null
         dragFrom = null
         suitableTargets = null
         dragTo.set(-1f, -1f)
@@ -386,24 +367,20 @@ class GameScreen(
      * and maximum drag radius from the game settings
      */
     private fun calcSuitableTargets(
-        pB: Ball?,
-        dF: BaseSocket?
+        pB: Ball?, dF: BaseSocket?
     ): Set<Ball>? {
-        if (pB == null || dF == null)
-            return null
+        if (pB == null || dF == null) return null
         val dragFromCoord = dF.absDrawCoord()
         return world.balls.filter { b ->
             b != pB && b.coord.dst(dragFromCoord) < (maxConnLen + 1) * ctx.wc.radius // other balls in range
                     && b.sockets.mapNotNull { s -> s.conn }
                 .none { c -> c.inSocket.ball == pB || c.outSocket.ball == pB }
                     // not connected to the pointed ball yet
-                    && (if (dF is InSocket) b.outSock else b.inSock)
-                .any { s ->
+                    && (if (dF is InSocket) b.outSock else b.inSock).any { s ->
                     s.conn == null && s.color == dF.color && s.absDrawCoord()
                         .dst(dragFromCoord) < maxConnLen * ctx.wc.radius
                 } // and matching free connector in range
-        }
-            .toSet()
+        }.toSet()
     }
 
     /**
@@ -427,15 +404,12 @@ class GameScreen(
         override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
             if (inShowAMove) return super.touchDragged(screenX, screenY, pointer)
             val v = ctx.pointerPosition(input.x, input.y)
-            if (pointedBall == null)
-                pointTheBall(world.ballPointedBy(v))
+            if (pointedBall == null) pointTheBall(world.ballPointedBy(v))
             if (pointedBall != null && dragFrom == null) {
                 setDragFrom(v)
-                if (dragFrom == null && pointedBallCenter.dst(v) > ctx.wc.radius * 2)
-                    pointedBall = null
+                if (dragFrom == null && pointedBallCenter.dst(v) > ctx.wc.radius * 2) pointedBall = null
             }
-            if (dragFrom != null)
-                setDragTo(v)
+            if (dragFrom != null) setDragTo(v)
             return super.touchDragged(screenX, screenY, pointer)
         }
 
@@ -478,8 +452,7 @@ class GameScreen(
             val v1 = v.minus(pointedBallCenter).scl(0.5f)
             val dF = pB.sockets.firstOrNull { it.conn == null && it.coord.epsilonEquals(v1, ctx.wc.radius * 0.3f) }
             dragFrom = dF
-            if (dF == null)
-                return
+            if (dF == null) return
             suitableTargets = calcSuitableTargets(pB, dF)
             if (suitableTargets?.isEmpty() == true) // No suitable targets, do not start drag from this socket
                 dragFrom = null

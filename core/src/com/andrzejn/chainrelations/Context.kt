@@ -168,6 +168,8 @@ class Context(
     val largeradius: TextureRegion get() = texture("largeradius")
     val colors6: TextureRegion get() = texture("colors6")
     val colors7: TextureRegion get() = texture("colors7")
+    val recycle: TextureRegion get() = texture("recycle")
+    val death: TextureRegion get() = texture("death")
 
     /**
      * Create a bitmap font with given size, base color etc. from the provided TrueType font.

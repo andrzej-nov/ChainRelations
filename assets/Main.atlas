@@ -129,3 +129,13 @@ colors7
    xy: 260, 850
    size: 120,120
    index: -1
+recycle
+   rotate: false
+   xy: 0, 420
+   size: 150,150
+   index: -1
+death
+   rotate: false
+   xy: 160, 420
+   size: 150,150
+   index: -1

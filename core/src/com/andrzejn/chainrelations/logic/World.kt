@@ -23,7 +23,7 @@ class World(
     /**
      * The list of the balls in game
      */
-    var balls: List<Ball> = List(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
+    var balls: MutableList<Ball> = MutableList(ctx.wc.ballsCount) { Ball(ctx, cnt++).also { it.setElementCoords() } }
 
     /**
      * The ball connectors
@@ -128,19 +128,22 @@ class World(
         }
         ctx.score.addPoints(ballsToClear.size)
         ballsToClear.forEach { b ->
-            Timeline.createSequence()
+            val seq = Timeline.createSequence()
                 .push(Tween.call { _, _ -> b.inDeath = true })
                 .beginParallel()
                 .push(Tween.to(b, TW_ALPHA, 1f).target(0f))
                 .push(Tween.to(b, TW_EYE_HK, 0.5f).target(0f))
                 .end()
-                .push(Tween.call { _, _ -> b.reset() })
-                .beginParallel()
-                .push(Tween.to(b, TW_ALPHA, 1f).target(1f))
-                .push(Tween.to(b, TW_EYE_HK, 1f).target(1f))
-                .end()
-                .setCallback { _, _ -> b.inDeath = false }
-                .start(ctx.tweenManager)
+            if (ctx.gs.isRecycle) {
+                seq.push(Tween.call { _, _ -> b.reset() })
+                    .beginParallel()
+                    .push(Tween.to(b, TW_ALPHA, 1f).target(1f))
+                    .push(Tween.to(b, TW_EYE_HK, 1f).target(1f))
+                    .end()
+                    .setCallback { _, _ -> b.inDeath = false }
+            } else
+                seq.setCallback { _, _ -> balls.remove(b) }
+            seq.start(ctx.tweenManager)
         }
         ballsToClear.flatMap { it.sockets }.mapNotNull { it.conn }.toMutableSet().also { it.add(con) }.forEach {
             it.clear()
@@ -207,13 +210,14 @@ class World(
      * Deserialize the whole world for game load
      */
     fun deserialize(s: String) {
-        val width = s.substring(16..19).toFloat()
-        val height = s.substring(20..23).toFloat()
+        val width = s.substring(17..20).toFloat()
+        val height = s.substring(21..24).toFloat()
         ctx.wc.setValues(width, height)
-        balls = List(ctx.wc.ballsCount) { Ball(ctx, 0) }
-        var i = 26
+        val ballsCount = s.substring(25..26).toInt()
+        balls = MutableList(ballsCount) { Ball(ctx, 0) }
+        var i = 27
         val bi = balls.iterator()
-        repeat(ctx.wc.ballsCount) { i = bi.next().deserialize(s, i) }
+        repeat(ballsCount) { i = bi.next().deserialize(s, i) }
         connectors.clear()
         val connCount = s.substring(i..i + 2).toInt()
         i += 3
