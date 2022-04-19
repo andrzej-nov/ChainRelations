@@ -2,9 +2,9 @@
 
 **Chain Relations** is a small casual existential game about life, human needs and long-term relations.
 
-https://user-images.githubusercontent.com/89737218/162968270-6aa30746-8165-4126-b23c-cf8bb86fa376.mp4
+![Clipboard01!](https://user-images.githubusercontent.com/89737218/164009636-a513f32f-f540-4b04-8dac-d9f49f459ee0.jpg)
 
-![Clipboard02!](https://user-images.githubusercontent.com/89737218/162968539-faea3fec-6ec0-41f7-a611-4dee8a661d09.jpg)
+https://user-images.githubusercontent.com/89737218/164009583-ab634b5f-f95e-4472-8736-b11c3577d8f2.mp4
 
 **Game objective:** connect the balls' same-colored inputs to outputs. Completely connected balls disappear.
 The possible connection range is limited, so plan your moves.
