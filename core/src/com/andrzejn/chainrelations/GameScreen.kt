@@ -30,6 +30,11 @@ class GameScreen(
      */
     var maxConnLen: Float = ctx.gs.maxRadius
 
+    /**
+     * Set to true on first show call. Used by the Home/Settings screen to determone what to do on the Back button
+     */
+    var wasDisplayed = false
+
     private val ball = Sprite(ctx.ball)
     private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
     private val settings = Sprite(ctx.settings).also { it.setAlpha(0.8f) }
@@ -87,6 +92,7 @@ class GameScreen(
      */
     override fun show() {
         super.show()
+        wasDisplayed = true
         input.inputProcessor = ia
         timeStart = Calendar.getInstance().timeInMillis
         Gdx.graphics.isContinuousRendering = true
