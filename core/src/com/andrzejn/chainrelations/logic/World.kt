@@ -5,6 +5,7 @@ import aurelienribon.tweenengine.Tween
 import com.andrzejn.chainrelations.Context
 import com.andrzejn.chainrelations.helper.TW_ALPHA
 import com.andrzejn.chainrelations.helper.TW_EYE_HK
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import java.util.*
 import kotlin.random.Random

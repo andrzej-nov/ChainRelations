@@ -127,8 +127,16 @@ class Ball(
     /**
      * Apply slight accelerometer force, to let the balls respons to the real world gravitation
      */
-    fun applyAccelerometers(): Vector2 =
-        force[0].add(Gdx.input.accelerometerY * ctx.wc.radius / 5, -Gdx.input.accelerometerX * ctx.wc.radius / 5)
+    fun applyAccelerometers() {
+        val x = Gdx.input.accelerometerX * ctx.wc.radius / 5
+        val y = Gdx.input.accelerometerY * ctx.wc.radius / 5
+        when (Gdx.input.rotation) {
+            0 -> force[0].add(-x, y)
+            90 -> force[0].add(y, x)
+            180 -> force[0].add(x, -y)
+            270 -> force[0].add(-y, -x)
+        }
+    }
 
     /**
      * Visual ball center coordinates. May differ from the actual coord by 1 pixel, to avoid balls' minor visual
