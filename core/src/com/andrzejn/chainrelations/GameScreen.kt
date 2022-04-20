@@ -32,11 +32,12 @@ class GameScreen(
 
     private val ball = Sprite(ctx.ball)
     private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
-    private val home = Sprite(ctx.settings).also { it.setAlpha(0.8f) }
+    private val settings = Sprite(ctx.settings).also { it.setAlpha(0.8f) }
     private val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
     private val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
     private val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
     private val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
+    private val menu = Sprite(ctx.menu).also { it.setAlpha(0.8f) }
 
     /**
      * The input adapter instance for this screen
@@ -101,11 +102,19 @@ class GameScreen(
         val buttonSize = ctx.wc.buttonSize
         val fontHeight = ctx.wc.fontHeight
         ctx.score.setCoords(ctx.wc.fontHeight)
-        play.setBounds(5f, fontHeight + 5 * buttonSize, buttonSize, buttonSize)
         help.setBounds(5f, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
         hit.setBounds(5f, fontHeight + buttonSize, buttonSize, buttonSize)
-        exit.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
-        home.setBounds(width - 5f - buttonSize, fontHeight + 3 * buttonSize, buttonSize, buttonSize)
+
+        play.setBounds(width - 10f - 2 * buttonSize, fontHeight + 8 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize)
+        settings.setBounds(
+            width - 10f - 2 * buttonSize,
+            fontHeight + 5 * buttonSize + 10,
+            2 * buttonSize,
+            2 * buttonSize
+        )
+        exit.setBounds(width - 10f - 2 * buttonSize, fontHeight + 2 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize)
+
+        menu.setBounds(width - 5f - buttonSize, fontHeight + buttonSize, buttonSize, buttonSize)
     }
 
     /**
@@ -165,6 +174,8 @@ class GameScreen(
         if (suitableTargets?.isEmpty() == true) cleanDragState(false)
     }
 
+    private var isMenuDisplayed = false
+
     /**
      * Invoked on each screen rendering. Recalculates ball moves, invokes timer actions and draws rthe screen.
      */
@@ -223,20 +234,31 @@ class GameScreen(
             )
         }
         // Draw buttons, scores and hand sprite on show-a-move
-        if (world.balls.size <= 6) ctx.sd.filledRectangle(
-            play.x - 5,
-            play.y - 5,
-            play.width + 10,
-            play.height + 10,
-            ctx.theme.scorePoints
-        )
-        play.draw(ctx.batch)
         help.draw(ctx.batch)
         hit.draw(ctx.batch)
-        exit.draw(ctx.batch)
-        home.draw(ctx.batch)
         ctx.score.draw(ctx.batch)
-        if (inShowAMove) hand.draw(ctx.batch)
+        if (inShowAMove)
+            hand.draw(ctx.batch)
+        else if (isMenuDisplayed) {
+            ctx.sd.filledRectangle(
+                exit.x - 10,
+                exit.y - 10,
+                exit.width + 20,
+                exit.height * 4 + 20,
+                ctx.theme.gameBorders
+            )
+            if (world.balls.size <= 6) ctx.sd.filledRectangle(
+                play.x - 5,
+                play.y - 5,
+                play.width + 10,
+                play.height + 10,
+                ctx.theme.scorePoints
+            )
+            play.draw(ctx.batch)
+            settings.draw(ctx.batch)
+            exit.draw(ctx.batch)
+        }
+        menu.draw(ctx.batch)
         if (ctx.batch.isDrawing) ctx.batch.end()
     }
 
@@ -306,10 +328,10 @@ class GameScreen(
         }
 
         Timeline.createSequence().push(Tween.call { _, _ ->
-                hand.setPosition(
-                    help.x + help.width / 2 - hand.width / 2, help.y + help.height / 2 - hand.height
-                )
-            })
+            hand.setPosition(
+                help.x + help.width / 2 - hand.width / 2, help.y + help.height / 2 - hand.height
+            )
+        })
             .push(Tween.to(hand, TW_POS_XY, 1f).target(dF.ball.coord.x - hand.width / 2, dF.ball.coord.y - hand.height))
             .push(Tween.call { _, _ -> pointTheBall(dF.ball) }).setCallback { _, _ -> showAMoveMiddle(dF) }
             .start(ctx.tweenManager)
@@ -340,16 +362,16 @@ class GameScreen(
             return
         }
         Timeline.createSequence().push(
-                Tween.to(hand, TW_POS_XY, 1f).target(dT.coord.x - hand.width / 2, dT.coord.y - hand.height)
-            ).pushPause(0.2f).push(Tween.call { _, _ ->
-                val dF = dragFrom
-                if (dF != null) {
-                    world.addConnector(dF, dT)
-                    thereWasAMove = true
-                }
-                cleanDragState(true)
-                inShowAMove = false
-            }).start(ctx.tweenManager)
+            Tween.to(hand, TW_POS_XY, 1f).target(dT.coord.x - hand.width / 2, dT.coord.y - hand.height)
+        ).pushPause(0.2f).push(Tween.call { _, _ ->
+            val dF = dragFrom
+            if (dF != null) {
+                world.addConnector(dF, dT)
+                thereWasAMove = true
+            }
+            cleanDragState(true)
+            inShowAMove = false
+        }).start(ctx.tweenManager)
     }
 
     /**
@@ -377,9 +399,9 @@ class GameScreen(
                 .none { c -> c.inSocket.ball == pB || c.outSocket.ball == pB }
                     // not connected to the pointed ball yet
                     && (if (dF is InSocket) b.outSock else b.inSock).any { s ->
-                    s.conn == null && s.color == dF.color && s.absDrawCoord()
-                        .dst(dragFromCoord) < maxConnLen * ctx.wc.radius
-                } // and matching free connector in range
+                s.conn == null && s.color == dF.color && s.absDrawCoord()
+                    .dst(dragFromCoord) < maxConnLen * ctx.wc.radius
+            } // and matching free connector in range
         }.toSet()
     }
 
@@ -429,12 +451,18 @@ class GameScreen(
                 }
             }
             cleanDragState(true)
+            if (isMenuDisplayed) {
+                isMenuDisplayed = false
+                when {
+                    buttonTouched(v, play) -> newGame(false)
+                    buttonTouched(v, exit) -> Gdx.app.exit()
+                    buttonTouched(v, settings) -> ctx.game.setScreen<HomeScreen>()
+                    buttonTouched(v, menu) -> isMenuDisplayed = false
+                }
+            } else if (buttonTouched(v, menu)) isMenuDisplayed = true
             when {
-                buttonTouched(v, play) -> newGame(false)
-                buttonTouched(v, exit) -> Gdx.app.exit()
                 buttonTouched(v, hit) -> world.randomHit()
                 buttonTouched(v, help) -> showAMove()
-                buttonTouched(v, home) -> ctx.game.setScreen<HomeScreen>()
             }
             return super.touchUp(screenX, screenY, pointer, button)
         }

@@ -139,3 +139,8 @@ death
    xy: 160, 420
    size: 150,150
    index: -1
+menu
+   rotate: false
+   xy: 0, 580
+   size: 100,100
+   index: -1
