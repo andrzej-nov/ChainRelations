@@ -15,6 +15,11 @@ class WorldConstants(
     var ballsCount: Int
 ) {
     /**
+     * Device screen rotation. Getting rotation is a costly call, so it is checked by timer in the main render method.
+     */
+    var rotation: Int = 0
+
+    /**
      * Font height for the score display
      */
     var fontHeight: Int = 0

@@ -183,6 +183,8 @@ class World(
         if (t - lastBlinkTime < 3000)
             return
         lastBlinkTime = t
+        ctx.wc.rotation = Gdx.input.rotation // Actually it is not related to blinking, but rotation check is costly
+        // procedure, so it must be checked rarely
         val b = balls.filter { !it.inBlink && !it.inDeath }.random()
         Timeline.createSequence()
             .push(Tween.call { _, _ -> b.inBlink = true })

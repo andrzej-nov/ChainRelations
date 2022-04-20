@@ -130,7 +130,7 @@ class Ball(
     fun applyAccelerometers() {
         val x = Gdx.input.accelerometerX * ctx.wc.radius / 5
         val y = Gdx.input.accelerometerY * ctx.wc.radius / 5
-        when (Gdx.input.rotation) {
+        when (ctx.wc.rotation) {
             0 -> force[0].add(-x, y)
             90 -> force[0].add(y, x)
             180 -> force[0].add(x, -y)
