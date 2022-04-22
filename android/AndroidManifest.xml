@@ -12,7 +12,8 @@
         android:isGame="true"
         android:appCategory="game"
         android:label="@string/app_name"
-        tools:ignore="UnusedAttribute">
+        tools:ignore="UnusedAttribute"
+        android:theme="@style/GdxTheme">
         <activity
             android:name="com.andrzejn.chainrelations.AndroidLauncher"
             android:label="@string/app_name" 
