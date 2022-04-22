@@ -37,6 +37,7 @@ class GameScreen(
 
     private val ball = Sprite(ctx.ball)
     private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
+    private val playblue = Sprite(ctx.playblue).also { it.setAlpha(0.8f) }
     private val settings = Sprite(ctx.settings).also { it.setAlpha(0.8f) }
     private val help = Sprite(ctx.help).also { it.setAlpha(0.8f) }
     private val exit = Sprite(ctx.exit).also { it.setAlpha(0.8f) }
@@ -112,6 +113,12 @@ class GameScreen(
         hit.setBounds(5f, fontHeight + buttonSize, buttonSize, buttonSize)
 
         play.setBounds(width - 10f - 2 * buttonSize, fontHeight + 8 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize)
+        playblue.setBounds(
+            width - 10f - 2 * buttonSize,
+            fontHeight + 8 * buttonSize + 10,
+            2 * buttonSize,
+            2 * buttonSize
+        )
         settings.setBounds(
             width - 10f - 2 * buttonSize,
             fontHeight + 5 * buttonSize + 10,
@@ -253,14 +260,10 @@ class GameScreen(
                 exit.height * 4 + 20,
                 ctx.theme.gameBorders
             )
-            if (world.balls.size <= 6) ctx.sd.filledRectangle(
-                play.x - 5,
-                play.y - 5,
-                play.width + 10,
-                play.height + 10,
-                ctx.theme.scorePoints
-            )
-            play.draw(ctx.batch)
+            if (world.balls.size <= 6)
+                play.draw(ctx.batch)
+            else
+                playblue.draw(ctx.batch)
             settings.draw(ctx.batch)
             exit.draw(ctx.batch)
         }

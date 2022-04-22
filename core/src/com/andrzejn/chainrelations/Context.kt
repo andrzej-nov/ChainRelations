@@ -172,6 +172,7 @@ class Context(
     val death: TextureRegion get() = texture("death")
     val menu: TextureRegion get() = texture("menu")
     val resume: TextureRegion get() = texture("resume")
+    val playblue: TextureRegion get() = texture("playblue")
 
     /**
      * Create a bitmap font with given size, base color etc. from the provided TrueType font.
