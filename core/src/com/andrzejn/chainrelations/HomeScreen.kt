@@ -82,6 +82,8 @@ class HomeScreen(
      */
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
+        if (width == 0 || height == 0) // Window minimize on desktop works that way
+            return
         ctx.setCamera(width, height)
         val baseHeight = ctx.camera.viewportHeight
         baseWidth = min(ctx.camera.viewportWidth, baseHeight * 3 / 4)

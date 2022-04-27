@@ -18,12 +18,12 @@ class Score(
     /**
      * Number of moves
      */
-    var moves: Int = 0
+    private var moves: Int = 0
 
     /**
      * Number of points for killed balls
      */
-    var points: Int = 0
+    private var points: Int = 0
 
     private var recordMoves: Int = 0
     private var recordPoints: Int = 0

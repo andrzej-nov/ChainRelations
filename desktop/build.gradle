@@ -1,9 +1,9 @@
 sourceCompatibility = 8.0
-sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../assets", "resources"]
+sourceSets.main.java.srcDirs = ['src/']
+sourceSets.main.resources.srcDirs = ['../assets', 'resources']
 
-project.ext.mainClassName = "com.andrzejn.chainrelations.DesktopLauncher"
-project.ext.assetsDir = new File("../assets")
+project.ext.mainClassName = 'com.andrzejn.chainrelations.DesktopLauncher'
+project.ext.assetsDir = new File('../assets')
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -16,7 +16,7 @@ task run(dependsOn: classes, type: JavaExec) {
 
     if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
         // Required to run on macOS
-        jvmArgs += "-XstartOnFirstThread"
+        jvmArgs += '-XstartOnFirstThread'
     }
 }
 
@@ -44,4 +44,4 @@ task dist(type: Jar) {
 
 dist.dependsOn classes
 
-eclipse.project.name = appName + "-desktop"
+eclipse.project.name = appName + '-desktop'

@@ -38,13 +38,6 @@ class SaveGame(
     }
 
     /**
-     * Deletes saved game
-     */
-    fun clearSavedGame() {
-        ctx.gs.savedGame = ""
-    }
-
-    /**
      * Serialized save game
      */
     fun savedGame(): String = ctx.gs.savedGame

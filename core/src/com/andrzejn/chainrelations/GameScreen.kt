@@ -104,6 +104,8 @@ class GameScreen(
      */
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
+        if (width == 0 || height == 0) // Window minimize on desktop works that way
+            return
         ctx.setCamera(width, height)
         world.resize(width.toFloat(), height.toFloat())
         val buttonSize = ctx.wc.buttonSize
