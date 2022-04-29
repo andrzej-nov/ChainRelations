@@ -72,7 +72,6 @@ class GameScreen(
      */
     fun newGame(loadSavedGame: Boolean) {
         ctx.score.reset()
-        updateInGameDuration()
         timeStart = Calendar.getInstance().timeInMillis
         ctx.wc.ballsCount = ctx.gs.ballsCount
         world = World(ctx)
@@ -157,6 +156,8 @@ class GameScreen(
      * Addns the last in-game duration to the total counter
      */
     private fun updateInGameDuration() {
+        if (ctx.gs.inGameDuration > 31536000000) // Milliseconds in year
+            ctx.gs.inGameDuration = 0
         ctx.gs.inGameDuration += Calendar.getInstance().timeInMillis - timeStart
         timeStart = Calendar.getInstance().timeInMillis
     }
