@@ -526,7 +526,10 @@ class GameScreen(
             }
             Tween.to(sprite, TW_POS_XY, 3f)
                 .target((graphics.width - sprite.width) / 2f, graphics.height.toFloat())
-                .setCallback { _, _ -> drawGhost = false }.start(ctx.tweenManager)
+                .setCallback { _, _ ->
+                    drawGhost = false
+                    sprite.setPosition(-1000f, -1000f)
+                }.start(ctx.tweenManager)
         }
     }
 }
