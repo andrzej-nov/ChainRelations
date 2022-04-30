@@ -5,6 +5,7 @@ import aurelienribon.tweenengine.Tween
 import com.andrzejn.chainrelations.helper.TW_POS_XY
 import com.andrzejn.chainrelations.logic.*
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Gdx.graphics
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.math.Vector2
 import ktx.app.KtxScreen
 import ktx.math.minus
+import kotlin.random.Random
 import java.util.*
 
 /**
@@ -33,7 +35,7 @@ class GameScreen(
     /**
      * Set to true on first show call. Used by the Home/Settings screen to determone what to do on the Back button
      */
-    var wasDisplayed = false
+    var wasDisplayed: Boolean = false
 
     private val ball = Sprite(ctx.ball)
     private val play = Sprite(ctx.play).also { it.setAlpha(0.8f) }
@@ -44,6 +46,14 @@ class GameScreen(
     private val hit = Sprite(ctx.hit).also { it.setAlpha(0.8f) }
     private val hand = Sprite(ctx.hand).also { it.setAlpha(0.6f) }
     private val menu = Sprite(ctx.menu).also { it.setAlpha(0.8f) }
+    private val ghost = Sprite(ctx.ghost).apply {
+        setAlpha(0.7f)
+        setPosition(-1000f, -1000f)
+    }
+    private val balloon = Sprite(ctx.balloon).apply {
+        setAlpha(0.7f)
+        setPosition(-1000f, -1000f)
+    }
 
     /**
      * The input adapter instance for this screen
@@ -57,7 +67,7 @@ class GameScreen(
         // Initialize WorldConstants before creating the World
         ctx.wc = WorldConstants(ctx.gs.ballsCount).also {
             it.setValues(
-                Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()
+                graphics.width.toFloat(), graphics.height.toFloat()
             )
         }
     }
@@ -95,7 +105,7 @@ class GameScreen(
         wasDisplayed = true
         input.inputProcessor = ia
         timeStart = Calendar.getInstance().timeInMillis
-        Gdx.graphics.isContinuousRendering = true
+        graphics.isContinuousRendering = true
     }
 
     /**
@@ -115,16 +125,10 @@ class GameScreen(
 
         play.setBounds(width - 10f - 2 * buttonSize, fontHeight + 8 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize)
         playblue.setBounds(
-            width - 10f - 2 * buttonSize,
-            fontHeight + 8 * buttonSize + 10,
-            2 * buttonSize,
-            2 * buttonSize
+            width - 10f - 2 * buttonSize, fontHeight + 8 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize
         )
         settings.setBounds(
-            width - 10f - 2 * buttonSize,
-            fontHeight + 5 * buttonSize + 10,
-            2 * buttonSize,
-            2 * buttonSize
+            width - 10f - 2 * buttonSize, fontHeight + 5 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize
         )
         exit.setBounds(width - 10f - 2 * buttonSize, fontHeight + 2 * buttonSize + 10, 2 * buttonSize, 2 * buttonSize)
 
@@ -192,6 +196,8 @@ class GameScreen(
 
     private var isMenuDisplayed = false
 
+    private var drawGhost = false
+
     /**
      * Invoked on each screen rendering. Recalculates ball moves, invokes timer actions and draws rthe screen.
      */
@@ -253,26 +259,29 @@ class GameScreen(
         help.draw(ctx.batch)
         hit.draw(ctx.batch)
         ctx.score.draw(ctx.batch)
-        if (inShowAMove)
-            hand.draw(ctx.batch)
+        if (noMoreBalls())
+            ctx.sd.filledRectangle(menu.x - 5, menu.y - 5, menu.width + 10, menu.height + 10, ctx.theme.scorePoints)
+        if (inShowAMove) hand.draw(ctx.batch)
         else if (isMenuDisplayed) {
             ctx.sd.filledRectangle(
-                exit.x - 10,
-                exit.y - 10,
-                exit.width + 20,
-                exit.height * 4 + 20,
-                ctx.theme.gameBorders
+                exit.x - 10, exit.y - 10, exit.width + 20, exit.height * 4 + 20, ctx.theme.gameBorders
             )
-            if (world.balls.size <= 6)
-                play.draw(ctx.batch)
-            else
-                playblue.draw(ctx.batch)
+            if (noMoreBalls()) play.draw(ctx.batch) else playblue.draw(ctx.batch)
             settings.draw(ctx.batch)
             exit.draw(ctx.batch)
         }
         menu.draw(ctx.batch)
+        if (drawGhost) {
+            ghost.draw(ctx.batch)
+            balloon.draw(ctx.batch)
+        }
         if (ctx.batch.isDrawing) ctx.batch.end()
     }
+
+    /**
+     * Minimum ball size reached
+     */
+    private fun noMoreBalls() = world.balls.size <= 6
 
     /**
      * Ensures the ball is fully visible
@@ -343,8 +352,7 @@ class GameScreen(
             hand.setPosition(
                 help.x + help.width / 2 - hand.width / 2, help.y + help.height / 2 - hand.height
             )
-        })
-            .push(Tween.to(hand, TW_POS_XY, 1f).target(dF.ball.coord.x - hand.width / 2, dF.ball.coord.y - hand.height))
+        }).push(Tween.to(hand, TW_POS_XY, 1f).target(dF.ball.coord.x - hand.width / 2, dF.ball.coord.y - hand.height))
             .push(Tween.call { _, _ -> pointTheBall(dF.ball) }).setCallback { _, _ -> showAMoveMiddle(dF) }
             .start(ctx.tweenManager)
     }
@@ -378,7 +386,7 @@ class GameScreen(
         ).pushPause(0.2f).push(Tween.call { _, _ ->
             val dF = dragFrom
             if (dF != null) {
-                world.addConnector(dF, dT)
+                world.addConnector(dF, dT) { endOfGameAnimation() }
                 thereWasAMove = true
             }
             cleanDragState(true)
@@ -458,7 +466,7 @@ class GameScreen(
                 setDragTo(v)
                 val otherBall = world.ballPointedBy(dragTo)
                 if (otherBall != null && suitableTargets?.contains(otherBall) == true) {
-                    world.addConnector(dF, otherBall)
+                    world.addConnector(dF, otherBall) { endOfGameAnimation() }
                     thereWasAMove = true
                 }
             }
@@ -505,6 +513,20 @@ class GameScreen(
             val dF = dragFrom ?: return
             val dragFromCoord = dF.absDrawCoord()
             dragTo = v.sub(dragFromCoord).clamp(0f, maxConnLen * ctx.wc.radius).add(dragFromCoord)
+        }
+    }
+
+    private fun endOfGameAnimation() {
+        if (noMoreBalls()) {
+            drawGhost = true
+            val sprite = (if (Random.nextFloat() < 0.5f) ghost else balloon).apply {
+                setSize(ctx.wc.radius * 3, ctx.wc.radius * 3)
+                setOriginCenter()
+                setPosition((graphics.width - width) / 2f, 0f)
+            }
+            Tween.to(sprite, TW_POS_XY, 3f)
+                .target((graphics.width - sprite.width) / 2f, graphics.height.toFloat())
+                .setCallback { _, _ -> drawGhost = false }.start(ctx.tweenManager)
         }
     }
 }

@@ -108,7 +108,7 @@ class World(
     /**
      * Add the connector from the socket to the ball. Updates scores, triggers death of fully connected balls if any
      */
-    fun addConnector(from: BaseSocket, otherBall: Ball): Boolean {
+    fun addConnector(from: BaseSocket, otherBall: Ball, deathCallback: () -> Unit): Boolean {
         val fromBall = from.ball
         val con = if (from is InSocket) {
             val outSocket = otherBall.outSock.firstOrNull { it.conn == null && it.color == from.color } ?: return false
@@ -143,7 +143,10 @@ class World(
                     .end()
                     .setCallback { _, _ -> b.inDeath = false }
             } else
-                seq.setCallback { _, _ -> balls.remove(b) }
+                seq.setCallback { _, _ ->
+                    balls.remove(b)
+                    deathCallback()
+                }
             seq.start(ctx.tweenManager)
         }
         ballsToClear.flatMap { it.sockets }.mapNotNull { it.conn }.toMutableSet().also { it.add(con) }.forEach {

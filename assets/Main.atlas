@@ -86,12 +86,12 @@ icongithub
   index: -1
 darktheme
   rotate: false
-  xy: 570, 665
+  xy: 570, 675
   size: 150, 150
   index: -1
 lighttheme
   rotate: false
-  xy: 570, 815
+  xy: 570, 825
   size: 150, 150
   index: -1
 logo
@@ -153,4 +153,14 @@ playblue
    rotate: false
    xy: 220, 580
    size: 100,100
+   index: -1
+ghost
+   rotate: false
+   xy: 570, 370
+   size: 150,150
+   index: -1
+balloon
+   rotate: false
+   xy: 570, 520
+   size: 150,150
    index: -1
