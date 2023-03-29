@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace 'com.andrzejn.chainrelations'
     compileSdk 33
     defaultConfig {
         applicationId 'com.andrzejn.chainrelations'
@@ -40,22 +41,14 @@ android {
 
     }
     packagingOptions {
-        // Preventing from license violations (more or less):
-        pickFirst 'META-INF/LICENSE.txt'
-        pickFirst 'META-INF/LICENSE'
-        pickFirst 'META-INF/license.txt'
-        pickFirst 'META-INF/LGPL2.1'
-        pickFirst 'META-INF/NOTICE.txt'
-        pickFirst 'META-INF/NOTICE'
-        pickFirst 'META-INF/notice.txt'
-        // Excluding unnecessary meta-data:
-        exclude 'META-INF/robovm/ios/robovm.xml'
-        exclude 'META-INF/DEPENDENCIES.txt'
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/dependencies.txt'
+        resources {
+            // Excluding unnecessary meta-data:
+            excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES', 'META-INF/dependencies.txt']
+            // Preventing from license violations (more or less):
+            pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1', 'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
+        }
     }
 }
-
 
 
 // Called every time gradle gets executed, takes the native dependencies of
