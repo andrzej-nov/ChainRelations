@@ -26,7 +26,7 @@ import space.earlygrey.shapedrawer.ShapeDrawer
  * so everything should be passed in the Context object on each app object creation or method call
  * where it is needed.
  */
-@Suppress("ArrayInDataClass", "KDocMissingDocumentation")
+@Suppress("ArrayInDataClass", "KDocMissingDocumentation", "LongLine")
 class Context(
     /**
      * Reference to the Main game object. Needed to switch game screens on different points of execution.

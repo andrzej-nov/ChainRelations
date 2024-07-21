@@ -25,7 +25,7 @@ of the game.
 
 The game is provided in two options:
 
-- **Desktop Java**. [Download ChainRelations.jar](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.7/ChainRelations.jar).
+- **Desktop Java**. [Download ChainRelations.jar](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.8/ChainRelations.jar).
   Run it with `java -jar ChainRelations.jar` command line, or in most cases just double-click the ChainRelations.jar 
   file. It has been tested with Java 18 Runtime, should also work with prior versions up to Java 8.
     - **On MacOS** you will get a warning about unidentified developer. Start the ChainRelations.jar 
@@ -35,7 +35,7 @@ The game is provided in two options:
 
 - **Android**. [Get it on Google Play](https://play.google.com/store/apps/details?id=com.andrzejn.chainrelations)
   (recommended) or
-  [download the ChainRelations.apk](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.7/ChainRelations.apk)
+  [download the ChainRelations.apk](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.8/ChainRelations.apk)
   here for manual install (it might be sometimes also a newer version than on the Google Play). It has been tested
   on Android 8.0 and 10.0, should also work on any Android version starting from 4.4 and later.
 
@@ -55,12 +55,12 @@ Andrzej Novosiolov, as the original author.
 
 The game has been implemented using following tools and libraries:
 
-- [IntelliJ IDEA 2023.1 (Community Edition)](https://www.jetbrains.com/idea/download/)
-- [Android Studio 2022.1.1 Patch 2](https://developer.android.com/studio) (for the Android emulator)
-- [Gradle 7.4.2](https://gradle.org/)
-- [Kotlin 1.8.10](https://kotlinlang.org/)
-- [libGDX 1.11.0](https://libgdx.com/)
-- [libKTX 1.11.0-rc5](https://libktx.github.io/)
+- [IntelliJ IDEA 2024.1.4 (Community Edition)](https://www.jetbrains.com/idea/download/)
+- [Android Studio 2024.1.1 Patch 1](https://developer.android.com/studio) (for the Android emulator)
+- [Gradle 8.2.2](https://gradle.org/)
+- [Kotlin 2.0.0](https://kotlinlang.org/)
+- [libGDX 1.12.1](https://libgdx.com/)
+- [libKTX 1.12.1-rc1](https://libktx.github.io/)
 - [ShapeDrawer 2.6.0](https://github.com/earlygrey/shapedrawer#shape-drawer)
 - [Universal Tween Engine 6.3.3](https://github.com/AurelienRibon/universal-tween-engine)
 - Free icons from https://www.flaticon.com/

@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         //classpath "com.android.tools.build:gradle:$gradleVersion"
         // AGP Update Assistant needs this version numbers here, not in gradle.properties
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
         classpath "com.mobidevelop.robovm:robovm-gradle-plugin:$roboVMVersion"
@@ -19,11 +19,15 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+}
+
 allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
 
-    version = '1.7'
+    version = '1.8'
     ext {
         appName = 'ChainRelations'
     }

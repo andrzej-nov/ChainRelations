@@ -1,4 +1,7 @@
-sourceCompatibility = 8.0
+kotlin {
+    jvmToolchain 8
+}
+
 sourceSets.main.java.srcDirs = ['src/']
 sourceSets.main.resources.srcDirs = ['../assets', 'resources']
 
@@ -7,7 +10,8 @@ project.ext.assetsDir = new File('../assets')
 
 import org.gradle.internal.os.OperatingSystem
 
-task run(dependsOn: classes, type: JavaExec) {
+tasks.register('run', JavaExec) {
+    dependsOn classes
     mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -20,7 +24,8 @@ task run(dependsOn: classes, type: JavaExec) {
     }
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
+tasks.register('debug', JavaExec) {
+    dependsOn classes
     mainClass = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -29,7 +34,7 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
-task dist(type: Jar) {
+tasks.register('dist', Jar) {
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     manifest {
         attributes 'Main-Class': project.mainClassName
