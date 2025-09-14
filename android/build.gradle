@@ -4,21 +4,21 @@ plugins {
 }
 
 android {
-    namespace 'com.andrzejn.chainrelations'
-    compileSdk 34
+    namespace = 'com.andrzejn.chainrelations'
+    compileSdk = 36
     defaultConfig {
-        applicationId 'com.andrzejn.chainrelations'
-        minSdk 19
-        targetSdk 34
-        versionCode 9
-        versionName '1.8'
-        multiDexEnabled true
+        applicationId = 'com.andrzejn.chainrelations'
+        minSdk = 19
+        targetSdk = 36
+        versionCode = 10
+        versionName = '1.9'
+        multiDexEnabled = true
     }
     compileOptions {
         // Android versions prior to 12.0 (SDK level 32) do not support Java versions over 1.8
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
-        coreLibraryDesugaringEnabled true
+        coreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = 1.8
@@ -45,7 +45,25 @@ android {
         }
 
     }
+    configurations { natives }
+    dependencies {
+        implementation project(':core')
+        coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugaringVersion"
+        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+        api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+    }
     packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false // Ensure modern packaging is used
+        }
         resources {
             // Excluding unnecessary meta-data:
             excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES', 'META-INF/dependencies.txt']
@@ -54,8 +72,8 @@ android {
         }
     }
     buildFeatures {
-        renderScript true
-        aidl true
+        renderScript = true
+        aidl = true
     }
 }
 
@@ -70,7 +88,7 @@ tasks.register('copyAndroidNatives') {
         file('libs/x86_64/').mkdirs()
         file('libs/x86/').mkdirs()
 
-        configurations.getByName('natives').copy().files.each { final jar ->
+        configurations.natives.copy().files.each { final jar ->
             def outputDir = null
             if (jar.name.endsWith('natives-armeabi-v7a.jar')) outputDir = file('libs/armeabi-v7a')
             if (jar.name.endsWith('natives-arm64-v8a.jar')) outputDir = file('libs/arm64-v8a')

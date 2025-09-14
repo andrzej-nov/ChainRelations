@@ -1,9 +1,30 @@
+plugins {
+    id 'kotlin'
+    id 'com.gradleup.shadow' version '9.1.0'
+}
+
 kotlin {
     jvmToolchain 8
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
 sourceSets.main.java.srcDirs = ['src/']
 sourceSets.main.resources.srcDirs = ['../assets', 'resources']
+
+dependencies {
+    implementation project(':core')
+    api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+    api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    api "space.earlygrey:shapedrawer:$shapedrawerVersion"
+    api "org.mini2Dx:universal-tween-engine:$tweenEngineVersion"
+}
 
 project.ext.mainClassName = 'com.andrzejn.chainrelations.DesktopLauncher'
 project.ext.assetsDir = new File('../assets')
@@ -34,19 +55,18 @@ tasks.register('debug', JavaExec) {
     debug = true
 }
 
-tasks.register('dist', Jar) {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+// Run the Gradle desktop:shadowJar configuration to create the self-sufficient Jar package
+// that could be runned on desktops
+shadowJar {
+    archiveClassifier = ''
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
-    dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    with jar
+
+    // Exclude problematic files that might cause issues
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
 }
-
-
-dist.dependsOn classes
 
 eclipse.project.name = appName + '-desktop'
