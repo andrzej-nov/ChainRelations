@@ -17,7 +17,7 @@ class SaveGame(
      * Serialize the whole game
      */
     private fun serialize(world: World): String {
-        val sb = com.badlogic.gdx.utils.StringBuilder()
+        val sb = StringBuilder()
         ctx.gs.serialize(sb)
         ctx.score.serialize(sb)
         world.serialize(sb)

@@ -204,7 +204,7 @@ class World(
     /**
      * Serialize the whole world for game save
      */
-    fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
+    fun serialize(sb: StringBuilder) {
         sb.append(ctx.wc.width.toInt(), 4).append(ctx.wc.height.toInt(), 4)
         sb.append(balls.size, 2)
         balls.forEach { it.serialize(sb) }

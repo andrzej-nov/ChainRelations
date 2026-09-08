@@ -1,7 +1,6 @@
 package com.andrzejn.chainrelations.logic
 
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.StringBuilder
 
 /**
  * The connector between two sockets

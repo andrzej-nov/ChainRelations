@@ -5,7 +5,9 @@ plugins {
 
 sourceSets.main.java.srcDirs = ['src/']
 
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 
 ext {
     mainClassName = 'com.andrzejn.chainrelations.IOSLauncher'
@@ -28,5 +30,3 @@ dependencies {
 robovm {
     archs = 'thumbv7:arm64'
 }
-
-eclipse.project.name = appName + '-ios'

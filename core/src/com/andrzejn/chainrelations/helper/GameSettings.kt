@@ -155,7 +155,7 @@ class GameSettings {
     /**
      * Serialize game settings, to include into the saved game. Always 6 characters.
      */
-    fun serialize(sb: com.badlogic.gdx.utils.StringBuilder) {
+    fun serialize(sb: StringBuilder) {
         sb.append(serializeFloat(iMaxRadius)).append(ballsCount).append(colorsCount).append(if (isRecycle) 1 else 0)
     }
 

@@ -1,16 +1,10 @@
 plugins {
-    id 'kotlin'
-    id 'com.gradleup.shadow' version '9.1.0'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'com.gradleup.shadow' version '9.6.1'
 }
 
 kotlin {
-    jvmToolchain 8
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
+    jvmToolchain(17)
 }
 
 sourceSets.main.java.srcDirs = ['src/']
@@ -24,12 +18,11 @@ dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     api "space.earlygrey:shapedrawer:$shapedrawerVersion"
     api "org.mini2Dx:universal-tween-engine:$tweenEngineVersion"
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
 project.ext.mainClassName = 'com.andrzejn.chainrelations.DesktopLauncher'
 project.ext.assetsDir = new File('../assets')
-
-import org.gradle.internal.os.OperatingSystem
 
 tasks.register('run', JavaExec) {
     dependsOn classes
@@ -39,7 +32,7 @@ tasks.register('run', JavaExec) {
     workingDir = project.assetsDir
     ignoreExitValue = true
 
-    if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         // Required to run on macOS
         jvmArgs += '-XstartOnFirstThread'
     }
@@ -68,5 +61,3 @@ shadowJar {
     exclude 'META-INF/*.DSA'
     exclude 'META-INF/*.RSA'
 }
-
-eclipse.project.name = appName + '-desktop'

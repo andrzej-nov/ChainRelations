@@ -3,7 +3,6 @@ package com.andrzejn.chainrelations.logic
 import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.StringBuilder
 
 /**
  * The ball socket. Base object provides the logic common for incoming and outgoing sockets

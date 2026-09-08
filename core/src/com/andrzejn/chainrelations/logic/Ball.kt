@@ -4,7 +4,6 @@ import com.andrzejn.chainrelations.Context
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.StringBuilder
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.floor
