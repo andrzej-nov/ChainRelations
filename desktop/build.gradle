@@ -11,7 +11,7 @@ sourceSets.main.java.srcDirs = ['src/']
 sourceSets.main.resources.srcDirs = ['../assets', 'resources']
 
 dependencies {
-    implementation project(':core')
+    implementation(project(':core'))
     api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
@@ -55,6 +55,7 @@ shadowJar {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     // Exclude problematic files that might cause issues
     exclude 'META-INF/*.SF'

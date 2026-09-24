@@ -27,7 +27,7 @@ The game is provided in two options:
 
 - **Desktop Java**. [Download ChainRelations.jar](https://github.com/andrzej-nov/ChainRelations/releases/download/v1.10/ChainRelations.jar).
   Run it with `java -jar ChainRelations.jar` command line, or in most cases just double-click the ChainRelations.jar 
-  file. It has been tested with Java 18 Runtime, should also work with prior versions up to Java 8.
+  file. Requires Java 17 Runtime or later.
     - **On MacOS** you will get a warning about unidentified developer. Start the ChainRelations.jar 
       using Finder context menu instead of Launchpad,
       [as explained here](https://www.bemidjistate.edu/offices/its/knowledge-base/how-to-open-an-app-from-an-unidentified-developer-and-exempt-it-from-gatekeeper/)
@@ -50,7 +50,7 @@ Andrzej Novosiolov, as the original author.
 
 The game has been implemented using following tools and libraries:
 
-- [IntelliJ IDEA 2026.2.2 (Free Tier)](https://www.jetbrains.com/idea/download/)
+- [IntelliJ IDEA 2026.2.3 (Free Tier)](https://www.jetbrains.com/idea/download/)
 - [Android Studio Quail 4 | 2026.1.4](https://developer.android.com/studio) (for the Android emulator)
 - [Gradle 9.7.1](https://gradle.org/)
 - [Kotlin 2.4.20](https://kotlinlang.org/)

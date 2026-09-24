@@ -19,7 +19,7 @@ launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 
 dependencies {
-    implementation project(':core')
+    implementation(project(':core'))
     api "com.mobidevelop.robovm:robovm-rt:$roboVMVersion"
     api "com.mobidevelop.robovm:robovm-cocoatouch:$roboVMVersion"
     api "com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion"
